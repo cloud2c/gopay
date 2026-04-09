@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // MiniPay 小程序支付接口 https://help.lcsw.cn/xrmpic/tisnldchblgxohfl/rinsc3#title-node17

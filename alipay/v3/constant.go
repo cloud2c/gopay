@@ -10,13 +10,15 @@ const (
 	MethodPut           = "PUT"
 	MethodDelete        = "DELETE"
 	MethodPatch         = "PATCH"
-	HeaderAuthorization = "Authorization"
-	HeaderRequestID     = "alipay-request-id"
-	HeaderSdkVersion    = "alipay-sdk-version"
-	HeaderAppAuthToken  = "alipay-app-auth-token"
-	HeaderTimestamp     = "alipay-timestamp"
-	HeaderNonce         = "alipay-nonce"
-	HeaderSignature     = "alipay-signature"
+	HeaderAuthorization   = "Authorization"
+	HeaderRequestID       = "alipay-request-id"
+	HeaderSdkVersion      = "alipay-sdk-version"
+	HeaderAppAuthToken    = "alipay-app-auth-token"
+	HeaderTimestamp       = "alipay-timestamp"
+	HeaderNonce           = "alipay-nonce"
+	HeaderSignature       = "alipay-signature"
+	HeaderEncryptType     = "alipay-encrypt-type"     // V3 内容加密类型（如 AES）
+	HeaderContentEncrypt  = "alipay-content-encrypt"  // V3 响应内容加密标识
 
 	SignTypeRSA = "ALIPAY-SHA256withRSA"
 

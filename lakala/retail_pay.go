@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // 创建线下支付订单

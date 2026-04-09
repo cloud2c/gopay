@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 	"github.com/go-pay/util"
 	"github.com/go-pay/xlog"
 )

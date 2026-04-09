@@ -6,18 +6,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // 资金授权操作查询接口 alipay.fund.auth.operation.detail.query
 // StatusCode = 200 is success
 func (a *ClientV3) FundAuthOperationDetailQuery(ctx context.Context, bm gopay.BodyMap) (aliRsp *FundAuthOperationDetailQueryRsp, err error) {
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3FundAuthOperationDetailQuery, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3FundAuthOperationDetailQuery, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3FundAuthOperationDetailQuery, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -42,11 +38,7 @@ func (a *ClientV3) FundAuthOrderFreeze(ctx context.Context, bm gopay.BodyMap) (a
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3FundAuthOrderFreeze, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3FundAuthOrderFreeze, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3FundAuthOrderFreeze, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -71,11 +63,7 @@ func (a *ClientV3) FundAuthOrderUnfreeze(ctx context.Context, bm gopay.BodyMap) 
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3FundAuthOrderUnfreeze, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3FundAuthOrderUnfreeze, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3FundAuthOrderUnfreeze, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -100,11 +88,7 @@ func (a *ClientV3) FundAuthOrderVoucherCreate(ctx context.Context, bm gopay.Body
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3FundAuthOrderVoucherCreate, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3FundAuthOrderVoucherCreate, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3FundAuthOrderVoucherCreate, aat)
 	if err != nil {
 		return nil, err
 	}

@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/go-pay/gopay"
-	"github.com/go-pay/gopay/pkg/xhttp"
+	"github.com/cloud2c/gopay"
+	"github.com/cloud2c/gopay/pkg/xhttp"
 )
 
 // 企业付款（企业向微信用户个人付款）

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // alipay.marketing.activity.batchquery(条件查询活动列表)

@@ -7,8 +7,8 @@ import (
 
 	"github.com/go-pay/crypto/xpem"
 	"github.com/go-pay/crypto/xrsa"
-	"github.com/go-pay/gopay"
-	"github.com/go-pay/gopay/pkg/xhttp"
+	"github.com/cloud2c/gopay"
+	"github.com/cloud2c/gopay/pkg/xhttp"
 	"github.com/go-pay/xlog"
 )
 
@@ -20,7 +20,8 @@ type ClientV3 struct {
 	AliPayRootCertSN   string
 	AppAuthToken       string
 	IsProd             bool
-	aesKey             string // biz_content 加密的 AES KEY
+	aesKey             string // biz_content 加密的 AES KEY（Base64 编码）
+	encryptType        string // 内容加密类型，默认 AES
 	proxyHost          string // 代理host地址
 	ivKey              []byte
 	privateKey         *rsa.PrivateKey
@@ -127,12 +128,27 @@ func (a *ClientV3) SetLogger(logger xlog.XLogger) *ClientV3 {
 	return a
 }
 
-// SetAESKey 设置 biz_content 的AES加密key，设置此参数默认开启 biz_content 参数加密
-// 注意：目前不可用，设置后会报错
+// SetAESKey 设置 V3 接口内容加密的 AES 密钥（Base64 编码）
+// 设置此参数后，V3 POST 请求将自动对请求体进行 AES-128-CBC 加密，并添加 alipay-encrypt-type Header
+// AES 密钥从支付宝开放平台「开发设置 > 接口内容加密方式」获取
 func (a *ClientV3) SetAESKey(aesKey string) *ClientV3 {
 	a.aesKey = aesKey
+	a.encryptType = "AES"
 	a.ivKey = []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	return a
+}
+
+// SetEncryptType 设置内容加密类型，默认 AES
+func (a *ClientV3) SetEncryptType(encryptType string) *ClientV3 {
+	if encryptType != "" {
+		a.encryptType = encryptType
+	}
+	return a
+}
+
+// IsEncryptEnabled 是否启用了内容加密
+func (a *ClientV3) IsEncryptEnabled() bool {
+	return a.aesKey != ""
 }
 
 // SetProxyHost 设置的 ProxyHost

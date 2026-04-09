@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // 小程序退回开发 alipay.open.mini.version.audited.cancel
@@ -18,11 +18,7 @@ func (a *ClientV3) OpenMiniVersionAuditedCancel(ctx context.Context, bm gopay.Bo
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3OpenMiniVersionAuditedCancel, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionAuditedCancel, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionAuditedCancel, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -44,11 +40,7 @@ func (a *ClientV3) OpenMiniVersionGrayOnline(ctx context.Context, bm gopay.BodyM
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3OpenMiniVersionGrayOnline, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionGrayOnline, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionGrayOnline, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -70,11 +62,7 @@ func (a *ClientV3) OpenMiniVersionGrayCancel(ctx context.Context, bm gopay.BodyM
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3OpenMiniVersionGrayCancel, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionGrayCancel, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionGrayCancel, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -92,11 +80,7 @@ func (a *ClientV3) OpenMiniVersionGrayCancel(ctx context.Context, bm gopay.BodyM
 // StatusCode = 200 is success
 func (a *ClientV3) OpenMiniVersionOnline(ctx context.Context, bm gopay.BodyMap) (aliRsp *OpenMiniVersionOnlineRsp, err error) {
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3OpenMiniVersionOnline, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionOnline, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionOnline, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -118,11 +102,7 @@ func (a *ClientV3) OpenMiniVersionOffline(ctx context.Context, bm gopay.BodyMap)
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3OpenMiniVersionOffline, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionOffline, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionOffline, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -144,11 +124,7 @@ func (a *ClientV3) OpenMiniVersionRollback(ctx context.Context, bm gopay.BodyMap
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3OpenMiniVersionRollback, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionRollback, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionRollback, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -170,11 +146,7 @@ func (a *ClientV3) OpenMiniVersionDelete(ctx context.Context, bm gopay.BodyMap) 
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3OpenMiniVersionDelete, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionDelete, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionDelete, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -201,40 +173,7 @@ func (a *ClientV3) OpenMiniVersionAuditApply(ctx context.Context, bm gopay.BodyM
 
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
-	// 临时存放 body file
-	tempFile := make(gopay.BodyMap)
-	signMap := make(gopay.BodyMap)
-	// 遍历 map，把除了 file文件 字段之外的参数重新 set 到 bm 的 data 字段里签名用，然后移除自身
-	bm.SetBodyMap("data", func(b gopay.BodyMap) {
-		bm.Range(func(k string, v any) bool {
-			// 取出 file 类型文件，签名时需要移除文件字段
-			if file, ok := v.(*gopay.File); ok {
-				// 保存到临时存放的 map 中
-				tempFile.SetFormFile(k, file)
-				// 原map删除此文件
-				bm.Remove(k)
-				return true
-			}
-			// 非 file 类型的参数 set 到签名用的 map 中
-			signMap.Set(k, v)
-			// 非 file 类型的参数 set 到 data 字段中，然后从原map中删除
-			b.Set(k, v)
-			bm.Remove(k)
-			return true
-		})
-	})
-
-	authorization, err := a.authorization(MethodPost, v3OpenMiniVersionAuditApply, signMap, aat)
-	if err != nil {
-		return nil, err
-	}
-	// 重新把file设置到原map中
-	tempFile.Range(func(k string, v any) bool {
-		bm.SetFormFile(k, v.(*gopay.File))
-		return true
-	})
-
-	res, bs, err := a.doProdPostFile(ctx, bm, v3OpenMiniVersionAuditApply, authorization, aat)
+	res, bs, err := a.doProdPostFile(ctx, bm, v3OpenMiniVersionAuditApply, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -259,11 +198,7 @@ func (a *ClientV3) OpenMiniVersionUpload(ctx context.Context, bm gopay.BodyMap) 
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3OpenMiniVersionUpload, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionUpload, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3OpenMiniVersionUpload, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -290,11 +225,7 @@ func (a *ClientV3) OpenMiniTemplateUsageQuery(ctx context.Context, bm gopay.Body
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3OpenMiniTemplateUsageQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -321,11 +252,7 @@ func (a *ClientV3) OpenMiniVersionBuildQuery(ctx context.Context, bm gopay.BodyM
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3OpenMiniVersionBuildQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -352,11 +279,7 @@ func (a *ClientV3) OpenMiniVersionDetailQuery(ctx context.Context, bm gopay.Body
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3OpenMiniVersionDetailQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -379,11 +302,7 @@ func (a *ClientV3) OpenMiniVersionListQuery(ctx context.Context, bm gopay.BodyMa
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3OpenMiniVersionListQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -404,11 +323,7 @@ func (a *ClientV3) OpenMiniVersionListQuery(ctx context.Context, bm gopay.BodyMa
 // StatusCode = 200 is success
 func (a *ClientV3) OpenMiniExperienceCreate(ctx context.Context, bm gopay.BodyMap) (aliRsp *OpenMiniExperienceCreateRsp, err error) {
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3OpenMiniExperienceCreate, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3OpenMiniExperienceCreate, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3OpenMiniExperienceCreate, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -432,11 +347,7 @@ func (a *ClientV3) OpenMiniExperienceQuery(ctx context.Context, bm gopay.BodyMap
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3OpenMiniExperienceQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -461,11 +372,7 @@ func (a *ClientV3) OpenMiniExperienceCancel(ctx context.Context, bm gopay.BodyMa
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3OpenMiniExperienceCancel, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3OpenMiniExperienceCancel, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3OpenMiniExperienceCancel, aat)
 	if err != nil {
 		return nil, err
 	}

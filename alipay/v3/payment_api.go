@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 	"github.com/go-pay/xtime"
 )
 
@@ -20,11 +20,7 @@ func (a *ClientV3) TradePay(ctx context.Context, bm gopay.BodyMap) (aliRsp *Trad
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3TradePay, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3TradePay, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3TradePay, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +44,7 @@ func (a *ClientV3) TradeQuery(ctx context.Context, bm gopay.BodyMap) (aliRsp *Tr
 		return nil, errors.New("out_trade_no and trade_no are not allowed to be null at the same time")
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3TradeQuery, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3TradeQuery, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3TradeQuery, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -80,11 +72,7 @@ func (a *ClientV3) TradeRefund(ctx context.Context, bm gopay.BodyMap) (aliRsp *T
 		return nil, errors.New("out_trade_no and trade_no are not allowed to be null at the same time")
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3TradeRefund, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3TradeRefund, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3TradeRefund, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -112,11 +100,7 @@ func (a *ClientV3) TradeFastPayRefundQuery(ctx context.Context, bm gopay.BodyMap
 		return nil, errors.New("out_trade_no and trade_no are not allowed to be null at the same time")
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3TradeFastPayRefundQuery, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3TradeFastPayRefundQuery, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3TradeFastPayRefundQuery, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -140,11 +124,7 @@ func (a *ClientV3) TradeCancel(ctx context.Context, bm gopay.BodyMap) (aliRsp *T
 		return nil, errors.New("out_trade_no and trade_no are not allowed to be null at the same time")
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3TradeCancel, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3TradeCancel, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3TradeCancel, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -168,11 +148,7 @@ func (a *ClientV3) TradeClose(ctx context.Context, bm gopay.BodyMap) (aliRsp *Tr
 		return nil, errors.New("out_trade_no and trade_no are not allowed to be null at the same time")
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3TradeClose, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3TradeClose, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3TradeClose, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -199,11 +175,7 @@ func (a *ClientV3) DataBillDownloadUrlQuery(ctx context.Context, bm gopay.BodyMa
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3DataBillDownloadUrlQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -228,11 +200,7 @@ func (a *ClientV3) TradePrecreate(ctx context.Context, bm gopay.BodyMap) (aliRsp
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3TradePrecreate, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3TradePrecreate, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3TradePrecreate, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -428,11 +396,7 @@ func (a *ClientV3) TradeCreate(ctx context.Context, bm gopay.BodyMap) (aliRsp *T
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3TradeCreate, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3TradeCreate, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3TradeCreate, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -457,11 +421,7 @@ func (a *ClientV3) TradeOrderInfoSync(ctx context.Context, bm gopay.BodyMap) (al
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3TradeOrderInfoSync, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3TradeOrderInfoSync, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3TradeOrderInfoSync, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -482,11 +442,7 @@ func (a *ClientV3) TradeOrderInfoSync(ctx context.Context, bm gopay.BodyMap) (al
 // StatusCode = 200 is success
 func (a *ClientV3) ZolozAuthenticationSmilepayInitialize(ctx context.Context, bm gopay.BodyMap) (aliRsp *ZolozAuthenticationSmilepayInitializeRsp, err error) {
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3ZolozAuthenticationSmilepayInitialize, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3ZolozAuthenticationSmilepayInitialize, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3ZolozAuthenticationSmilepayInitialize, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -511,11 +467,7 @@ func (a *ClientV3) ZolozAuthenticationCustomerFtokenQuery(ctx context.Context, b
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3ZolozAuthenticationCustomerFtokenQuery, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3ZolozAuthenticationCustomerFtokenQuery, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3ZolozAuthenticationCustomerFtokenQuery, aat)
 	if err != nil {
 		return nil, err
 	}

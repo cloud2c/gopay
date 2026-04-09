@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // 换取授权访问令牌 alipay.system.oauth.token
@@ -21,11 +21,7 @@ func (a *ClientV3) SystemOauthToken(ctx context.Context, bm gopay.BodyMap) (aliR
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3SystemOauthToken, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3SystemOauthToken, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3SystemOauthToken, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -52,11 +48,7 @@ func (a *ClientV3) UserCertifyOpenQuery(ctx context.Context, bm gopay.BodyMap) (
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3UserCertifyOpenQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -81,11 +73,7 @@ func (a *ClientV3) UserCertifyOpenInitialize(ctx context.Context, bm gopay.BodyM
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3UserCertifyOpenInitialize, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3UserCertifyOpenInitialize, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3UserCertifyOpenInitialize, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -111,11 +99,7 @@ func (a *ClientV3) UserInfoShare(ctx context.Context, bm gopay.BodyMap) (aliRsp 
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
 	uri := v3UserInfoShare + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodPost, uri, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, uri, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -142,11 +126,7 @@ func (a *ClientV3) UserAuthRelationshipQuery(ctx context.Context, bm gopay.BodyM
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3UserAuthRelationshipQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -171,11 +151,7 @@ func (a *ClientV3) UserDelOauthDetailQuery(ctx context.Context, bm gopay.BodyMap
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3UserDelOauthDetailQuery, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3UserDelOauthDetailQuery, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3UserDelOauthDetailQuery, aat)
 	if err != nil {
 		return nil, err
 	}

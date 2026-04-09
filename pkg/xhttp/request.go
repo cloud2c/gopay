@@ -16,7 +16,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 type RequestIdHandler interface {

@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/go-pay/crypto/xpem"
-	"github.com/go-pay/gopay"
-	"github.com/go-pay/gopay/pkg/xhttp"
+	"github.com/cloud2c/gopay"
+	"github.com/cloud2c/gopay/pkg/xhttp"
 	"github.com/go-pay/smap"
 	"github.com/go-pay/xlog"
 )

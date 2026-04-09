@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // 创建现金活动 alipay.marketing.campaign.cash.create
@@ -17,11 +17,7 @@ func (a *ClientV3) MarketingCampaignCashCreate(ctx context.Context, bm gopay.Bod
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MarketingCampaignCashCreate, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MarketingCampaignCashCreate, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MarketingCampaignCashCreate, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -46,11 +42,7 @@ func (a *ClientV3) MarketingCampaignCashTrigger(ctx context.Context, bm gopay.Bo
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MarketingCampaignCashTrigger, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MarketingCampaignCashTrigger, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MarketingCampaignCashTrigger, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -75,11 +67,7 @@ func (a *ClientV3) MarketingCampaignCashStatusModify(ctx context.Context, bm gop
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MarketingCampaignCashStatusModify, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MarketingCampaignCashStatusModify, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MarketingCampaignCashStatusModify, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -103,11 +91,7 @@ func (a *ClientV3) MarketingCampaignCashListQuery(ctx context.Context, bm gopay.
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3MarketingCampaignCashListQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -134,11 +118,7 @@ func (a *ClientV3) MarketingCampaignCashDetailQuery(ctx context.Context, bm gopa
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3MarketingCampaignCashDetailQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -167,11 +147,7 @@ func (a *ClientV3) MarketingCampaignOrderVoucherConsult(ctx context.Context, bm 
 	authToken := bm.GetString("auth_token")
 	bm.Remove("auth_token")
 	uri := v3MarketingCampaignOrderVoucherConsult + "?auth_token=" + authToken
-	authorization, err := a.authorization(MethodPost, v3MarketingCampaignOrderVoucherConsult, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, uri, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, uri, aat)
 	if err != nil {
 		return nil, err
 	}

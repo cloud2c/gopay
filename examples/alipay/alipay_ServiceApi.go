@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-pay/crypto/xrsa"
-	"github.com/go-pay/gopay/alipay"
+	"github.com/cloud2c/gopay/alipay"
 	"github.com/go-pay/xlog"
 )
 

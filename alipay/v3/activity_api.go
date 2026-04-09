@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // 创建商家券活动 alipay.marketing.activity.ordervoucher.create
@@ -19,11 +19,7 @@ func (a *ClientV3) MarketingActivityOrderVoucherCreate(ctx context.Context, bm g
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MarketingActivityOrderVoucherCreate, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MarketingActivityOrderVoucherCreate, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MarketingActivityOrderVoucherCreate, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -49,11 +45,7 @@ func (a *ClientV3) MarketingActivityOrderVoucherCodeDeposit(ctx context.Context,
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
 	url := fmt.Sprintf(v3MarketingActivityOrderVoucherCodeDeposit, activityId)
-	authorization, err := a.authorization(MethodPost, url, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, url, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, url, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -79,11 +71,7 @@ func (a *ClientV3) MarketingActivityOrderVoucherModify(ctx context.Context, acti
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
 	url := fmt.Sprintf(v3MarketingActivityOrderVoucherModify, activityId)
-	authorization, err := a.authorization(MethodPatch, url, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPatch(ctx, bm, url, authorization, aat)
+	res, bs, err := a.doPatch(ctx, bm, url, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -109,11 +97,7 @@ func (a *ClientV3) MarketingActivityOrderVoucherStop(ctx context.Context, activi
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
 	url := fmt.Sprintf(v3MarketingActivityOrderVoucherStop, activityId)
-	authorization, err := a.authorization(MethodPatch, url, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPatch(ctx, bm, url, authorization, aat)
+	res, bs, err := a.doPatch(ctx, bm, url, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -136,11 +120,7 @@ func (a *ClientV3) MarketingActivityOrderVoucherAppend(ctx context.Context, acti
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
 	url := fmt.Sprintf(v3MarketingActivityOrderVoucherAppend, activityId)
-	authorization, err := a.authorization(MethodPatch, url, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPatch(ctx, bm, url, authorization, aat)
+	res, bs, err := a.doPatch(ctx, bm, url, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -163,11 +143,7 @@ func (a *ClientV3) MarketingActivityOrderVoucherUse(ctx context.Context, activit
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
 	url := fmt.Sprintf(v3MarketingActivityOrderVoucherUse, activityId, voucherCode)
-	authorization, err := a.authorization(MethodPost, url, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, url, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, url, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -193,11 +169,7 @@ func (a *ClientV3) MarketingActivityOrderVoucherRefund(ctx context.Context, acti
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
 	url := fmt.Sprintf(v3MarketingActivityOrderVoucherRefund, activityId, voucherCode)
-	authorization, err := a.authorization(MethodPost, url, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, url, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, url, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -225,11 +197,7 @@ func (a *ClientV3) MarketingActivityConsult(ctx context.Context, bm gopay.BodyMa
 		return nil, errors.New("user_id and open_id are not allowed to be null at the same time")
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MarketingActivityConsult, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MarketingActivityConsult, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MarketingActivityConsult, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -256,11 +224,7 @@ func (a *ClientV3) MarketingActivityOrderVoucherQuery(ctx context.Context, bm go
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3MarketingActivityOrderVoucherQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -287,11 +251,7 @@ func (a *ClientV3) MarketingActivityQuery(ctx context.Context, activityId string
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := fmt.Sprintf(v3MarketingActivityQuery, activityId) + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -318,11 +278,7 @@ func (a *ClientV3) MarketingActivityOrderVoucherCodeCount(ctx context.Context, a
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := fmt.Sprintf(v3MarketingActivityOrderVoucherCodeCount, activityId) + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -347,11 +303,7 @@ func (a *ClientV3) MarketingActivityBatchQuery(ctx context.Context, bm gopay.Bod
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MarketingActivityBatchQuery, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MarketingActivityBatchQuery, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MarketingActivityBatchQuery, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -384,11 +336,7 @@ func (a *ClientV3) MarketingActivityQueryUserBatchQueryVoucher(ctx context.Conte
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3MarketingActivityQueryUserBatchQueryVoucher + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -417,11 +365,7 @@ func (a *ClientV3) MarketingActivityQueryUserQueryVoucher(ctx context.Context, b
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3MarketingActivityQueryUserQueryVoucher + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -448,11 +392,7 @@ func (a *ClientV3) MarketingActivityQueryAppBatchQuery(ctx context.Context, acti
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := fmt.Sprintf(v3MarketingActivityQueryAppBatchQuery, activityId) + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -479,11 +419,7 @@ func (a *ClientV3) MarketingActivityQueryShopBatchQuery(ctx context.Context, act
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := fmt.Sprintf(v3MarketingActivityQueryShopBatchQuery, activityId) + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -510,11 +446,7 @@ func (a *ClientV3) MarketingActivityQueryGoodsBatchQuery(ctx context.Context, ac
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := fmt.Sprintf(v3MarketingActivityQueryGoodsBatchQuery, activityId) + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}

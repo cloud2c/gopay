@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // 蚂蚁店铺创建 ant.merchant.expand.shop.create
@@ -21,11 +21,7 @@ func (a *ClientV3) AntMerchantShopCreate(ctx context.Context, bm gopay.BodyMap) 
 		return nil, errors.New("contact_phone and contact_mobile are not allowed to be null at the same time")
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3AntMerchantShopCreate, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3AntMerchantShopCreate, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3AntMerchantShopCreate, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +44,7 @@ func (a *ClientV3) AntMerchantShopQuery(ctx context.Context, bm gopay.BodyMap) (
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3AntMerchantShopQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -76,11 +68,7 @@ func (a *ClientV3) AntMerchantShopModify(ctx context.Context, bm gopay.BodyMap) 
 		return nil, errors.New("contact_phone and contact_mobile are not allowed to be null at the same time")
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPatch, v3AntMerchantShopModify, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPatch(ctx, bm, v3AntMerchantShopModify, authorization, aat)
+	res, bs, err := a.doPatch(ctx, bm, v3AntMerchantShopModify, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -101,11 +89,7 @@ func (a *ClientV3) AntMerchantShopModify(ctx context.Context, bm gopay.BodyMap) 
 // StatusCode = 200 is success
 func (a *ClientV3) AntMerchantShopClose(ctx context.Context, bm gopay.BodyMap) (aliRsp *AntMerchantShopCloseRsp, err error) {
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPatch, v3AntMerchantShopClose, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPatch(ctx, bm, v3AntMerchantShopClose, authorization, aat)
+	res, bs, err := a.doPatch(ctx, bm, v3AntMerchantShopClose, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -125,11 +109,7 @@ func (a *ClientV3) AntMerchantOrderQuery(ctx context.Context, orderId string, bm
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := fmt.Sprintf(v3AntMerchantOrderQuery, orderId) + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -157,11 +137,7 @@ func (a *ClientV3) AntMerchantShopPageQuery(ctx context.Context, bm gopay.BodyMa
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3AntMerchantShopPageQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -188,40 +164,7 @@ func (a *ClientV3) AntMerchantExpandIndirectImageUpload(ctx context.Context, bm 
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
-	// 临时存放 body file
-	tempFile := make(gopay.BodyMap)
-	signMap := make(gopay.BodyMap)
-	// 遍历 map，把除了 file文件 字段之外的参数重新 set 到 bm 的 data 字段里签名用，然后移除自身
-	bm.SetBodyMap("data", func(b gopay.BodyMap) {
-		bm.Range(func(k string, v any) bool {
-			// 取出 file 类型文件，签名时需要移除文件字段
-			if file, ok := v.(*gopay.File); ok {
-				// 保存到临时存放的 map 中
-				tempFile.SetFormFile(k, file)
-				// 原map删除此文件
-				bm.Remove(k)
-				return true
-			}
-			// 非 file 类型的参数 set 到签名用的 map 中
-			signMap.Set(k, v)
-			// 非 file 类型的参数 set 到 data 字段中，然后从原map中删除
-			b.Set(k, v)
-			bm.Remove(k)
-			return true
-		})
-	})
-
-	authorization, err := a.authorization(MethodPost, v3AntMerchantExpandIndirectImageUpload, signMap, aat)
-	if err != nil {
-		return nil, err
-	}
-	// 重新把file设置到原map中
-	tempFile.Range(func(k string, v any) bool {
-		bm.SetFormFile(k, v.(*gopay.File))
-		return true
-	})
-
-	res, bs, err := a.doProdPostFile(ctx, bm, v3AntMerchantExpandIndirectImageUpload, authorization, aat)
+	res, bs, err := a.doProdPostFile(ctx, bm, v3AntMerchantExpandIndirectImageUpload, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -244,11 +187,7 @@ func (a *ClientV3) AntMerchantExpandMccQuery(ctx context.Context, bm gopay.BodyM
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3AntMerchantExpandMccQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -274,11 +213,7 @@ func (a *ClientV3) AntMerchantExpandShopReceiptAccountSave(ctx context.Context, 
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3AntMerchantExpandShopReceiptAccountSave, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3AntMerchantExpandShopReceiptAccountSave, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3AntMerchantExpandShopReceiptAccountSave, aat)
 	if err != nil {
 		return nil, err
 	}

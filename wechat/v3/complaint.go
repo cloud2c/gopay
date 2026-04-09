@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 	"github.com/go-pay/util/js"
 )
 

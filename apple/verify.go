@@ -3,7 +3,7 @@ package apple
 import (
 	"context"
 
-	"github.com/go-pay/gopay/pkg/xhttp"
+	"github.com/cloud2c/gopay/pkg/xhttp"
 )
 
 const (

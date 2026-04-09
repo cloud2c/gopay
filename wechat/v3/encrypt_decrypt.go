@@ -12,7 +12,7 @@ import (
 
 	"github.com/go-pay/crypto/aes"
 	"github.com/go-pay/crypto/xpem"
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // 敏感信息加密，默认使用最新的有效微信平台证书加密

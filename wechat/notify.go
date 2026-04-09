@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	xaes "github.com/go-pay/crypto/aes"
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // ParseNotifyToBodyMap 解析微信支付异步通知的结果到BodyMap（推荐）

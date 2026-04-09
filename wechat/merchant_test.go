@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/go-pay/crypto/xrsa"
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 	"github.com/go-pay/util"
 	"github.com/go-pay/xlog"
 )

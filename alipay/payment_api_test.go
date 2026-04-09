@@ -3,8 +3,8 @@ package alipay
 import (
 	"testing"
 
-	"github.com/go-pay/gopay"
-	"github.com/go-pay/gopay/alipay/cert"
+	"github.com/cloud2c/gopay"
+	"github.com/cloud2c/gopay/alipay/cert"
 	"github.com/go-pay/util"
 	"github.com/go-pay/xlog"
 )

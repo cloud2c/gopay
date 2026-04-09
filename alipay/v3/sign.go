@@ -11,13 +11,16 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 	"github.com/go-pay/util"
 	"github.com/go-pay/util/convert"
 )
 
 // v3 鉴权请求 Authorization Header
-func (a *ClientV3) authorization(method, uri string, bm gopay.BodyMap, appAuthToken string) (string, error) {
+// bm: 请求参数（普通签名时使用，加密签名时传 nil）
+// encryptedBody: 加密后的请求体字符串（加密签名时使用，普通签名时传空字符串）
+// 当 encryptedBody 不为空时，使用密文字符串参与签名（先加密后签名）
+func (a *ClientV3) authorization(method, uri string, bm gopay.BodyMap, appAuthToken, encryptedBody string) (string, error) {
 	var (
 		jb        = ""
 		aat       = a.AppAuthToken // 默认值
@@ -32,11 +35,17 @@ func (a *ClientV3) authorization(method, uri string, bm gopay.BodyMap, appAuthTo
 	if appAuthToken != "" {
 		aat = appAuthToken
 	}
-	if bm != nil {
-		// 签名body里需要删掉 alipay-app-auth-token
+
+	// 确定签名用的 body 内容
+	if encryptedBody != "" {
+		// 加密请求：body 直接使用密文字符串
+		jb = encryptedBody
+	} else if bm != nil {
+		// 普通请求：签名body里需要删掉 alipay-app-auth-token
 		bm.Remove(HeaderAppAuthToken)
 		jb = bm.JsonBody()
 	}
+
 	// ${authString}\n	步骤1中生成的认证串 authString。
 	// ${httpMethod}\n	本次请求的 http 方法，例如 GET\POST\PUT 等。
 	// ${httpReuqestUrl}\n   本次请求的 uri 信息，包括 queryString，不包括域名，例如 /v3/alipay/marketing/activity/ordervoucher/get?id=123。
@@ -64,7 +73,11 @@ func (a *ClientV3) authorization(method, uri string, bm gopay.BodyMap, appAuthTo
 		signStr += aat + "\n"
 	}
 	if a.DebugSwitch == gopay.DebugOn {
-		a.logger.Debugf("Alipay_V3_SignString:\n%s", signStr)
+		if encryptedBody != "" {
+			a.logger.Debugf("Alipay_V3_Encrypt_SignString:\n%s", signStr)
+		} else {
+			a.logger.Debugf("Alipay_V3_SignString:\n%s", signStr)
+		}
 	}
 
 	sign, err := a.rsaSign(signStr)

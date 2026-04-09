@@ -1,4 +1,4 @@
-module github.com/go-pay/gopay
+module github.com/cloud2c/gopay
 
 go 1.24.0
 

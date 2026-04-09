@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // 支付宝资金账户资产查询接口 alipay.fund.account.query
@@ -23,11 +23,7 @@ func (a *ClientV3) FundAccountQuery(ctx context.Context, bm gopay.BodyMap) (aliR
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3FundAccountQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -54,11 +50,7 @@ func (a *ClientV3) FundQuotaQuery(ctx context.Context, bm gopay.BodyMap) (aliRsp
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3FundQuotaQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -83,11 +75,7 @@ func (a *ClientV3) FundTransUniTransfer(ctx context.Context, bm gopay.BodyMap) (
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3FundTransUniTransfer, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3FundTransUniTransfer, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3FundTransUniTransfer, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -112,11 +100,7 @@ func (a *ClientV3) DataBillEreceiptApply(ctx context.Context, bm gopay.BodyMap) 
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3DataBillEreceiptApply, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3DataBillEreceiptApply, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3DataBillEreceiptApply, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -143,11 +127,7 @@ func (a *ClientV3) DataBillEreceiptQuery(ctx context.Context, bm gopay.BodyMap) 
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3DataBillEreceiptQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -170,11 +150,7 @@ func (a *ClientV3) FundTransCommonQuery(ctx context.Context, bm gopay.BodyMap) (
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3FundTransCommonQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -199,11 +175,7 @@ func (a *ClientV3) FundTransMultistepTransfer(ctx context.Context, bm gopay.Body
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3FundTransMultistepTransfer, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3FundTransMultistepTransfer, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3FundTransMultistepTransfer, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -228,11 +200,7 @@ func (a *ClientV3) FundTransMultistepQuery(ctx context.Context, bm gopay.BodyMap
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3FundTransMultistepQuery, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3FundTransMultistepQuery, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3FundTransMultistepQuery, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -257,11 +225,7 @@ func (a *ClientV3) FundTransRefund(ctx context.Context, bm gopay.BodyMap) (aliRs
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3FundTransRefund, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3FundTransRefund, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3FundTransRefund, aat)
 	if err != nil {
 		return nil, err
 	}

@@ -1,8 +1,8 @@
 package wechat
 
 import (
-	"github.com/go-pay/gopay"
-	"github.com/go-pay/gopay/wechat"
+	"github.com/cloud2c/gopay"
+	"github.com/cloud2c/gopay/wechat"
 	"github.com/go-pay/util"
 	"github.com/go-pay/xlog"
 )

@@ -1,7 +1,7 @@
 package alipay
 
 import (
-	"github.com/go-pay/gopay/alipay"
+	"github.com/cloud2c/gopay/alipay"
 	"github.com/go-pay/xlog"
 )
 

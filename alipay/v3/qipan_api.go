@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // 上传创建人群 alipay.merchant.qipan.crowd.create
@@ -17,11 +17,7 @@ func (a *ClientV3) MerchantQipanCrowdCreate(ctx context.Context, bm gopay.BodyMa
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MerchantQipanCrowdCreate, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanCrowdCreate, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanCrowdCreate, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -46,11 +42,7 @@ func (a *ClientV3) MerchantQipanCrowdUserAdd(ctx context.Context, bm gopay.BodyM
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MerchantQipanCrowdUserAdd, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanCrowdUserAdd, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanCrowdUserAdd, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -75,11 +67,7 @@ func (a *ClientV3) MerchantQipanCrowdUserDelete(ctx context.Context, bm gopay.Bo
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MerchantQipanCrowdUserDelete, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanCrowdUserDelete, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanCrowdUserDelete, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -100,11 +88,7 @@ func (a *ClientV3) MerchantQipanCrowdUserDelete(ctx context.Context, bm gopay.Bo
 // StatusCode = 200 is success
 func (a *ClientV3) MarketingQipanTagBaseBatchQuery(ctx context.Context, bm gopay.BodyMap) (aliRsp *MarketingQipanTagBaseBatchQueryRsp, err error) {
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodGet, v3MarketingQipanTagBaseBatchQuery, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, v3MarketingQipanTagBaseBatchQuery, authorization, aat)
+	res, bs, err := a.doGet(ctx, v3MarketingQipanTagBaseBatchQuery, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -131,11 +115,7 @@ func (a *ClientV3) MarketingQipanTagQuery(ctx context.Context, bm gopay.BodyMap)
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3MarketingQipanTagQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -156,11 +136,7 @@ func (a *ClientV3) MarketingQipanTagQuery(ctx context.Context, bm gopay.BodyMap)
 // StatusCode = 200 is success
 func (a *ClientV3) MarketingQipanCrowdBatchQuery(ctx context.Context, bm gopay.BodyMap) (aliRsp *MarketingQipanCrowdBatchQueryRsp, err error) {
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MarketingQipanCrowdBatchQuery, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MarketingQipanCrowdBatchQuery, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MarketingQipanCrowdBatchQuery, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -183,11 +159,7 @@ func (a *ClientV3) MarketingQipanCrowdQuery(ctx context.Context, bm gopay.BodyMa
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3MarketingQipanCrowdQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -212,11 +184,7 @@ func (a *ClientV3) MarketingQipanCrowdModify(ctx context.Context, bm gopay.BodyM
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MarketingQipanCrowdModify, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MarketingQipanCrowdModify, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MarketingQipanCrowdModify, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -241,11 +209,7 @@ func (a *ClientV3) MerchantQipanCrowdSpread(ctx context.Context, bm gopay.BodyMa
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MerchantQipanCrowdSpread, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanCrowdSpread, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanCrowdSpread, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -270,11 +234,7 @@ func (a *ClientV3) MerchantQipanGreyBlackCrowdCreate(ctx context.Context, bm gop
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MerchantQipanGreyBlackCrowdCreate, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanGreyBlackCrowdCreate, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanGreyBlackCrowdCreate, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -299,11 +259,7 @@ func (a *ClientV3) MerchantQipanGreyBlackCrowdUserAdd(ctx context.Context, bm go
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MerchantQipanGreyBlackCrowdUserAdd, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanGreyBlackCrowdUserAdd, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanGreyBlackCrowdUserAdd, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -328,11 +284,7 @@ func (a *ClientV3) MerchantQipanGreyBlackCrowdUserDelete(ctx context.Context, bm
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3MerchantQipanGreyBlackCrowdUserDelete, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanGreyBlackCrowdUserDelete, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3MerchantQipanGreyBlackCrowdUserDelete, aat)
 	if err != nil {
 		return nil, err
 	}

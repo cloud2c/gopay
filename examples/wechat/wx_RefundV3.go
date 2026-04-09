@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/go-pay/xlog"
 
-	"github.com/go-pay/gopay"
-	"github.com/go-pay/gopay/wechat/v3"
+	"github.com/cloud2c/gopay"
+	"github.com/cloud2c/gopay/wechat/v3"
 	"github.com/go-pay/util"
 )
 

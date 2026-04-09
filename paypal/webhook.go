@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 	"net/http"
 )
 

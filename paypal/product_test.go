@@ -9,7 +9,7 @@
 package paypal
 
 import (
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 	"github.com/go-pay/xlog"
 	"testing"
 )

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-pay/gopay"
+	"github.com/cloud2c/gopay"
 )
 
 // 芝麻GO签约预创单 zhima.credit.pe.zmgo.preorder.create
@@ -17,11 +17,7 @@ func (a *ClientV3) ZmGoPreorderCreate(ctx context.Context, bm gopay.BodyMap) (al
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPut, v3ZmGoPreorderCreate, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPut(ctx, bm, v3ZmGoPreorderCreate, authorization, aat)
+	res, bs, err := a.doPut(ctx, bm, v3ZmGoPreorderCreate, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -46,11 +42,7 @@ func (a *ClientV3) ZmGoCumulateSync(ctx context.Context, bm gopay.BodyMap) (aliR
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3ZmGoCumulateSync, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3ZmGoCumulateSync, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3ZmGoCumulateSync, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -77,11 +69,7 @@ func (a *ClientV3) ZmGoCumulateQuery(ctx context.Context, bm gopay.BodyMap) (ali
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3ZmGoCumulateQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -106,11 +94,7 @@ func (a *ClientV3) ZmGoSettleApply(ctx context.Context, bm gopay.BodyMap) (aliRs
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3ZmGoSettleApply, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3ZmGoSettleApply, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3ZmGoSettleApply, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -135,11 +119,7 @@ func (a *ClientV3) ZmGoSettleRefund(ctx context.Context, bm gopay.BodyMap) (aliR
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3ZmGoSettleApplyRefund, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3ZmGoSettleApplyRefund, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3ZmGoSettleApplyRefund, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -166,11 +146,7 @@ func (a *ClientV3) ZmGoAgreementQuery(ctx context.Context, bm gopay.BodyMap) (al
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3ZmGoAgreementQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -195,11 +171,7 @@ func (a *ClientV3) ZmGoAgreementQueryUnsign(ctx context.Context, bm gopay.BodyMa
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3ZmGoAgreementQueryUnsign, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3ZmGoAgreementQueryUnsign, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3ZmGoAgreementQueryUnsign, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -224,11 +196,7 @@ func (a *ClientV3) ZmGoTemplateCreate(ctx context.Context, bm gopay.BodyMap) (al
 		return nil, err
 	}
 	aat := bm.GetString(HeaderAppAuthToken)
-	authorization, err := a.authorization(MethodPost, v3ZmGoTemplateCreate, bm, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doPost(ctx, bm, v3ZmGoTemplateCreate, authorization, aat)
+	res, bs, err := a.doPost(ctx, bm, v3ZmGoTemplateCreate, aat)
 	if err != nil {
 		return nil, err
 	}
@@ -255,11 +223,7 @@ func (a *ClientV3) ZmGoTemplateQuery(ctx context.Context, bm gopay.BodyMap) (ali
 	aat := bm.GetString(HeaderAppAuthToken)
 	bm.Remove(HeaderAppAuthToken)
 	uri := v3ZmGoTemplateQuery + "?" + bm.EncodeURLParams()
-	authorization, err := a.authorization(MethodGet, uri, nil, aat)
-	if err != nil {
-		return nil, err
-	}
-	res, bs, err := a.doGet(ctx, uri, authorization, aat)
+	res, bs, err := a.doGet(ctx, uri, aat)
 	if err != nil {
 		return nil, err
 	}
