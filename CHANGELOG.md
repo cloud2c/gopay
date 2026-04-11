@@ -1,5 +1,35 @@
 # Changelog
 
+## v1.5.119
+
+### Fix: Alipay V3 Signature Verification Failure with AES Encryption
+
+When `aesKey` is set for content encryption, Alipay signs the **ciphertext** response, but the SDK was verifying the signature against the **decrypted plaintext**, causing `crypto/rsa: verification error`.
+
+#### What Changed
+
+- **`client.go`**: Added `rawBodyForSign` field to preserve the original response body before decryption.
+- **`request.go`**: Save the raw ciphertext before AES decryption; removed dependency on the `alipay-content-encrypt` response header (some APIs return encrypted content without this header, causing decryption to be skipped).
+- **`sign.go`**: `autoVerifySignByCert` now uses the raw ciphertext for signature verification when AES encryption is enabled, instead of the decrypted plaintext.
+
+#### Correct Verification Flow
+
+```
+Alipay returns: ciphertext body + signature (signed over ciphertext)
+    ↓
+doPost: save ciphertext → rawBodyForSign, decrypt → plaintext body
+    ↓
+autoVerifySignByCert: verify signature using rawBodyForSign (ciphertext) ✅
+    ↓
+API method: json.Unmarshal(plaintext body) to parse business data
+```
+
+#### Files Changed
+
+- `alipay/v3/client.go`
+- `alipay/v3/request.go`
+- `alipay/v3/sign.go`
+
 ## v1.5.118
 
 ### Refactor: Unified `do*` Method Signatures & Auto-Encryption
