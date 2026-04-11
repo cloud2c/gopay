@@ -126,15 +126,18 @@ func (a *ClientV3) doPost(ctx context.Context, bm gopay.BodyMap, uri, aat string
 		return nil, nil, err
 	}
 
-	// V3 内容解密：如果响应包含加密标识，则解密响应体
+	// V3 内容解密：当设置了 AES Key 且响应状态码为 200 时，尝试解密响应体
+	// 注意：支付宝 V3 签名是对加密后的密文做的，验签时需要使用密文而非明文
+	// 因此在解密前先保存原始密文供 autoVerifySignByCert 使用
 	if res.StatusCode == http.StatusOK && a.aesKey != "" {
-		if res.Header.Get(HeaderContentEncrypt) != "" {
-			decryptedBs, decErr := a.decryptV3Body(string(bs))
-			if decErr != nil {
-				a.logger.Debugf("Alipay_V3_Decrypt_Response_Error: %v", decErr)
-			} else {
-				bs = []byte(decryptedBs)
-			}
+		a.rawBodyForSign = make([]byte, len(bs))
+		copy(a.rawBodyForSign, bs)
+		decryptedBs, decErr := a.decryptV3Body(string(bs))
+		if decErr != nil {
+			// 解密失败，可能是响应未加密（如部分接口不加密响应），保留原始 bytes
+			a.logger.Debugf("Alipay_V3_Decrypt_Response_Error: %v", decErr)
+		} else {
+			bs = []byte(decryptedBs)
 		}
 	}
 

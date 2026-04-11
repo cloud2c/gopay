@@ -115,7 +115,14 @@ func (a *ClientV3) autoVerifySignByCert(res *http.Response, body []byte) (err er
 		if a.DebugSwitch == gopay.DebugOn {
 			a.logger.Debugf("Alipay_VerifySignHeader: alipay-timestamp=[%s], alipay-nonce=[%s], alipay-signature=[%s]", ts, nonce, sign)
 		}
-		signData := ts + "\n" + nonce + "\n" + string(body) + "\n"
+		// 支付宝 V3 签名是对加密后的密文做的，当设置了 AES Key 时，
+		// body 是解密后的明文，需要使用保存的原始密文来验签
+		signBody := body
+		if a.aesKey != "" && a.rawBodyForSign != nil {
+			signBody = a.rawBodyForSign
+			a.rawBodyForSign = nil // 使用后清除，避免影响下一次请求
+		}
+		signData := ts + "\n" + nonce + "\n" + string(signBody) + "\n"
 
 		signBytes, _ := base64.StdEncoding.DecodeString(sign)
 		sum256 := sha256.Sum256([]byte(signData))

@@ -30,6 +30,7 @@ type ClientV3 struct {
 	logger             xlog.XLogger
 	requestIdFunc      xhttp.RequestIdHandler
 	hc                 *xhttp.Client
+	rawBodyForSign     []byte // 解密前的原始响应体，用于签名验证（支付宝 V3 签名是对密文做的）
 }
 
 // NewClientV3 初始化支付宝客户端 V3
