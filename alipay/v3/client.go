@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-pay/crypto/xpem"
-	"github.com/go-pay/crypto/xrsa"
 	"github.com/cloud2c/gopay"
 	"github.com/cloud2c/gopay/pkg/xhttp"
+	"github.com/go-pay/crypto/xpem"
+	"github.com/go-pay/crypto/xrsa"
 	"github.com/go-pay/xlog"
 )
 
@@ -132,11 +132,81 @@ func (a *ClientV3) SetLogger(logger xlog.XLogger) *ClientV3 {
 // SetAESKey 设置 V3 接口内容加密的 AES 密钥（Base64 编码）
 // 设置此参数后，V3 POST 请求将自动对请求体进行 AES-128-CBC 加密，并添加 alipay-encrypt-type Header
 // AES 密钥从支付宝开放平台「开发设置 > 接口内容加密方式」获取
+//
+// 注意：不同 API 对加密的要求不同：
+//   - 人脸核身/OCR/数据核验等 V2 证书模式接口：必须使用 AES 加密 biz_content
+//   - 扫码支付/交易创建等 V3 接口：不支持内容加密，设置了反而会导致参数错误
+//
+// 使用建议：
+// 方案 A（推荐）：创建两个独立的 Client 实例
+//
+//	faceClient := alipay.NewClientV3(...).SetAESKey(aesKey)  // 人脸核身专用
+//	payClient := alipay.NewClientV3(...)                      // 支付专用（不设置 AES）
+//
+// 方案 B：使用 WithoutAES() 临时获取一个不加密的 Client（线程安全）
+//
+//	client.SetAESKey(aesKey)
+//	client.FaceVerificationInitialize(...)       // 使用 AES 加密
+//	client.WithoutAES().TradeCreate(...)          // 获取无加密的 Client 副本调用支付
+//	client.FaceVerificationQuery(...)             // 原 Client 不受影响，仍启用 AES
 func (a *ClientV3) SetAESKey(aesKey string) *ClientV3 {
 	a.aesKey = aesKey
 	a.encryptType = "AES"
 	a.ivKey = []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 	return a
+}
+
+// WithoutAES 返回一个新的 Client 副本，不启用 AES 加密
+// 原 Client 实例不受任何影响，此方法线程安全
+//
+// 使用场景：当全局设置了 AES Key（用于人脸核身等接口），但需要调用不支持加密的支付接口时
+//
+// 示例：
+//
+//	client.SetAESKey(aesKey)
+//	client.FaceVerificationInitialize(...)       // 使用 AES 加密
+//	client.WithoutAES().TradeCreate(...)          // 使用无加密的副本调用支付
+//	client.FaceVerificationQuery(...)             // 原 Client 仍启用 AES
+//
+// 注意：此方法返回的是新实例，不会修改原 Client 的状态
+func (a *ClientV3) WithoutAES() *ClientV3 {
+	return a.Clone()
+}
+
+// Clone 克隆当前 Client 实例，返回一个独立的新实例
+// 新实例共享私钥和证书配置，但不继承 AES 加密配置
+//
+// 使用场景：需要同时支持加密接口（人脸核身）和非加密接口（支付）时
+//
+// 示例：
+//
+//	baseClient := alipay.NewClientV3(appid, privateKey, isProd).SetCert(...)
+//
+//	// 人脸核身专用 client（带 AES 加密）
+//	faceClient := baseClient.Clone().SetAESKey(aesKey)
+//	faceClient.FaceVerificationInitialize(...)
+//
+//	// 支付专用 client（不带 AES 加密）
+//	payClient := baseClient.Clone()
+//	payClient.TradeCreate(...)
+func (a *ClientV3) Clone() *ClientV3 {
+	return &ClientV3{
+		AppId:              a.AppId,
+		AppCertSN:          a.AppCertSN,
+		AliPayPublicCertSN: a.AliPayPublicCertSN,
+		AliPayRootCertSN:   a.AliPayRootCertSN,
+		AppAuthToken:       a.AppAuthToken,
+		IsProd:             a.IsProd,
+		aesKey:             "", // 克隆时不继承 AES Key，避免误用
+		encryptType:        "",
+		proxyHost:          a.proxyHost,
+		privateKey:         a.privateKey,
+		aliPayPublicKey:    a.aliPayPublicKey,
+		DebugSwitch:        a.DebugSwitch,
+		logger:             a.logger,
+		requestIdFunc:      a.requestIdFunc,
+		hc:                 a.hc, // 共享 HTTP Client
+	}
 }
 
 // SetEncryptType 设置内容加密类型，默认 AES
@@ -155,7 +225,7 @@ func (a *ClientV3) IsEncryptEnabled() bool {
 // SetProxyHost 设置的 ProxyHost
 // 使用场景：
 // 1. 部署环境无法访问互联网，可以通过代理服务器访问
-// 2. 不设置则默认 https://api.mch.weixin.qq.com
+// 2. 不设置则默认 https://openapi.alipay.com
 func (a *ClientV3) SetProxyHost(proxyHost string) *ClientV3 {
 	before, found := strings.CutSuffix(proxyHost, "/")
 	if found {
