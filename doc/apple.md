@@ -9,7 +9,7 @@
 ```go
 import (
     "github.com/go-pay/xlog"
-    "github.com/go-pay/gopay/apple"
+    "github.com/cloud2c/gopay/apple"
 )
 
 // 初始化通联客户端
@@ -40,7 +40,7 @@ if err != nil {
 
 ```go
 import (
-    "github.com/go-pay/gopay/apple"
+    "github.com/cloud2c/gopay/apple"
     "github.com/go-pay/xlog"
 )
 
@@ -71,7 +71,7 @@ if rsp.Receipt != nil {
 
 ```go
 import (
-    "github.com/go-pay/gopay/apple"
+    "github.com/cloud2c/gopay/apple"
     "github.com/go-pay/xlog"
 )
 
