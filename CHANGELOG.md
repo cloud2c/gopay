@@ -1,5 +1,34 @@
 # Changelog
 
+## v1.5.120
+
+### Feat: Add WithoutAES and Clone methods for Alipay V3 Client
+
+Different Alipay APIs have different AES encryption requirements:
+- Face verification/OCR APIs require AES encryption for `biz_content`
+- Payment APIs (TradeCreate, TradePay, etc.) do NOT support content encryption, setting AES key causes parameter errors
+
+Added thread-safe methods to handle mixed encryption scenarios:
+- **`WithoutAES()`**: Returns a new Client instance without AES encryption, original client unaffected
+- **`Clone()`**: Returns an independent Client copy without inheriting AES config
+
+#### Usage
+
+```go
+// Option A: Separate clients (recommended)
+faceClient := alipay.NewClientV3(...).SetAESKey(aesKey)
+payClient := alipay.NewClientV3(...)
+
+// Option B: Thread-safe temporary switch
+client.SetAESKey(aesKey)
+client.FaceVerificationInitialize(...)
+client.WithoutAES().TradeCreate(...)  // original client still has AES
+```
+
+#### Files Changed
+
+- `alipay/v3/client.go`
+
 ## v1.5.119
 
 ### Fix: Alipay V3 Signature Verification Failure with AES Encryption
