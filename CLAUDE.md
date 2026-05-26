@@ -4,7 +4,7 @@
 
 GoPay 是一个 Go 语言的支付 SDK 项目，提供微信、支付宝、QQ、通联支付、拉卡拉、PayPal、扫呗、Apple 支付的统一接口。
 
-- **仓库**: https://github.com/go-pay/gopay
+- **仓库**: https://github.com/cloud2c/gopay
 - **Go 版本**: 1.24.0
 - **许可证**: Apache 2.0
 

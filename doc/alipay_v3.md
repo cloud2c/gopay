@@ -6,7 +6,7 @@
 
 > #### 希望有时间的伙伴儿Fork完后，补充并提交Pull Request，一起完善支付宝各个类别下的接口到相应的go文件中
 
-- 已实现API列表附录：[API 列表附录](https://github.com/go-pay/gopay/blob/main/doc/alipay_v3.md#%E9%99%84%E5%BD%95)
+- 已实现API列表附录：[API 列表附录](https://github.com/cloud2c/gopay/blob/main/doc/alipay_v3.md#%E9%99%84%E5%BD%95)
 
 - 开发文档（V3版）：[开发文档（V3版）](https://opendocs.alipay.com/open-v3) 
 
@@ -26,7 +26,7 @@
 
 ```go
 import (
-    "github.com/go-pay/gopay/alipay/v3"
+    "github.com/cloud2c/gopay/alipay/v3"
     "github.com/go-pay/xlog"
 )
 
@@ -64,11 +64,11 @@ err := client.SetCert("appPublicCert.crt bytes", "alipayRootCert bytes", "alipay
 
 ```go
 import (
-    "github.com/go-pay/gopay"
-    "github.com/go-pay/gopay/pkg/js"
+    "github.com/cloud2c/gopay"
+    "github.com/cloud2c/gopay/pkg/js"
     "github.com/go-pay/util"
     "github.com/go-pay/xlog"
-    "github.com/go-pay/gopay/alipay/v3"
+    "github.com/cloud2c/gopay/alipay/v3"
 )
 
 // 请求参数
@@ -98,8 +98,8 @@ xlog.Warnf("aliRsp.OutTradeNo:", aliRsp.OutTradeNo)
 
 ```go
 import (
-    "github.com/go-pay/gopay"
-    "github.com/go-pay/gopay/pkg/js"
+    "github.com/cloud2c/gopay"
+    "github.com/cloud2c/gopay/pkg/js"
     "github.com/go-pay/util"
     "github.com/go-pay/xlog"
 )
@@ -141,7 +141,7 @@ if res.StatusCode != Success {
 
 ```go
 import (
-    "github.com/go-pay/gopay/alipay"
+    "github.com/cloud2c/gopay/alipay"
 )
 
 // 解析异步通知的参数

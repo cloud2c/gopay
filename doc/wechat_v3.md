@@ -2,13 +2,13 @@
 
 > #### 推荐使用v3接口，官方在v3接口实现未覆盖或gopay未开发的接口，还继续用v2接口，欢迎参与完善v3接口。
 
-- 已实现API列表附录：[API 列表附录](https://github.com/go-pay/gopay/blob/main/doc/wechat_v3.md#%E9%99%84%E5%BD%95)
+- 已实现API列表附录：[API 列表附录](https://github.com/cloud2c/gopay/blob/main/doc/wechat_v3.md#%E9%99%84%E5%BD%95)
 
 - 微信官方文档：[商户平台文档](https://pay.weixin.qq.com/doc/v3/merchant/4012062524)、[服务商平台文档](https://pay.weixin.qq.com/doc/v3/partner/4012069852)
 
 - 通用规则：[通用规则](https://pay.weixin.qq.com/doc/v3/partner/4012081673)
 
-- GoPay微信v2文档：[GoPay微信v2文档](https://github.com/go-pay/gopay/blob/main/doc/wechat_v2.md) （部分接口仅v2版本支持）
+- GoPay微信v2文档：[GoPay微信v2文档](https://github.com/cloud2c/gopay/blob/main/doc/wechat_v2.md) （部分接口仅v2版本支持）
 
 ---
 
@@ -21,7 +21,7 @@
 ```go
 import (
     "github.com/go-pay/xlog"
-    "github.com/go-pay/gopay/wechat/v3"
+    "github.com/cloud2c/gopay/wechat/v3"
 )
 
 // NewClientV3 初始化微信客户端 v3
@@ -66,7 +66,7 @@ client.DebugSwitch = gopay.DebugOn
 - JSAPI下单 示例
 ```go
 import (
-    "github.com/go-pay/gopay"
+    "github.com/cloud2c/gopay"
 )
 
 expire := time.Now().Add(10 * time.Minute).Format(time.RFC3339)
@@ -128,7 +128,7 @@ jsapi, err := client.PaySignOfJSAPI("appid", "prepayid")
 
 ```go
 import (
-    "github.com/go-pay/gopay/wechat/v3"
+    "github.com/cloud2c/gopay/wechat/v3"
     "github.com/go-pay/xlog"
 )
 
@@ -151,7 +151,7 @@ if err != nil {
 
 ```go
 import (
-    "github.com/go-pay/gopay/wechat/v3"
+    "github.com/cloud2c/gopay/wechat/v3"
     "github.com/go-pay/xlog"
 )
 
@@ -208,7 +208,7 @@ result, err := notifyReq.DecryptRefundCipherText(apiV3Key)
 
 ```go
 import (
-    "github.com/go-pay/gopay/wechat/v3"
+    "github.com/cloud2c/gopay/wechat/v3"
 )
 
 // 获取微信平台证书和序列号信息，推荐使用后者
