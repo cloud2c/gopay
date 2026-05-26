@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.5.121
+
+### Feat: Sync Alipay APIs from upstream
+
+Added 4 new API modules with 25 new Alipay APIs:
+- **Ad API** (`ad_api.go`): Conversion data upload, ad report query, promotion page management, task ad query
+- **Fee API** (`fee_api.go`): Special fee rate application
+- **Risk API** (`risk_api.go`): Consumer complaint processing, marketing risk identification, industry risk identification, content risk detection
+- **Subscription API** (`subscription_api.go`): Product/price/customer/subscription CRUD operations
+
+### Chore: Replace import paths from go-pay to cloud2c
+
+Updated all documentation examples to use `github.com/cloud2c/gopay`.
+
 ## v1.5.120
 
 ### Feat: Add WithoutAES and Clone methods for Alipay V3 Client
