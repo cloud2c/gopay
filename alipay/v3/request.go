@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-pay/crypto/aes"
 	"github.com/cloud2c/gopay"
 	"github.com/cloud2c/gopay/pkg/xhttp"
+	"github.com/go-pay/crypto/aes"
 	"github.com/go-pay/util"
 )
 
@@ -130,8 +130,8 @@ func (a *ClientV3) doPost(ctx context.Context, bm gopay.BodyMap, uri, aat string
 	// 注意：支付宝 V3 签名是对加密后的密文做的，验签时需要使用密文而非明文
 	// 因此在解密前先保存原始密文供 autoVerifySignByCert 使用
 	if res.StatusCode == http.StatusOK && a.aesKey != "" {
-		a.rawBodyForSign = make([]byte, len(bs))
-		copy(a.rawBodyForSign, bs)
+		// 挂在响应上而不是存回 client，原因见 raw_body.go
+		stashRawBody(res, bs)
 		decryptedBs, decErr := a.decryptV3Body(string(bs))
 		if decErr != nil {
 			// 解密失败，可能是响应未加密（如部分接口不加密响应），保留原始 bytes

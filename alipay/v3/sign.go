@@ -108,27 +108,35 @@ func (a *ClientV3) rsaSign(str string) (string, error) {
 // =============================== 同步验签 ===============================
 
 func (a *ClientV3) autoVerifySignByCert(res *http.Response, body []byte) (err error) {
-	if a.aliPayPublicKey != nil {
-		ts := res.Header.Get(HeaderTimestamp)
-		nonce := res.Header.Get(HeaderNonce)
-		sign := res.Header.Get(HeaderSignature)
-		if a.DebugSwitch == gopay.DebugOn {
-			a.logger.Debugf("Alipay_VerifySignHeader: alipay-timestamp=[%s], alipay-nonce=[%s], alipay-signature=[%s]", ts, nonce, sign)
-		}
-		// 支付宝 V3 签名是对加密后的密文做的，当设置了 AES Key 时，
-		// body 是解密后的明文，需要使用保存的原始密文来验签
-		signBody := body
-		if a.aesKey != "" && a.rawBodyForSign != nil {
-			signBody = a.rawBodyForSign
-			a.rawBodyForSign = nil // 使用后清除，避免影响下一次请求
-		}
-		signData := ts + "\n" + nonce + "\n" + string(signBody) + "\n"
+	// 没有支付宝公钥就没法验签，直接放过
+	if a.aliPayPublicKey == nil {
+		return nil
+	}
+	ts := res.Header.Get(HeaderTimestamp)
+	nonce := res.Header.Get(HeaderNonce)
+	sign := res.Header.Get(HeaderSignature)
 
-		signBytes, _ := base64.StdEncoding.DecodeString(sign)
-		sum256 := sha256.Sum256([]byte(signData))
-		if err = rsa.VerifyPKCS1v15(a.aliPayPublicKey, crypto.SHA256, sum256[:], signBytes); err != nil {
-			return fmt.Errorf("[%w]: %v", gopay.VerifySignatureErr, err)
-		}
+	if a.DebugSwitch == gopay.DebugOn {
+		a.logger.Debugf("Alipay_VerifySignHeader: alipay-timestamp=[%s], alipay-nonce=[%s], alipay-signature=[%s]", ts, nonce, sign)
+	}
+	// 支付宝 V3 签名是对加密后的密文做的，当设置了 AES Key 时，
+	// body 已被 doPost 解密成明文，验签要用挂在响应上的那份密文
+	signBody := body
+	if raw := rawBodyOf(res); a.aesKey != "" && raw != nil {
+		signBody = raw
+	}
+	signData := ts + "\n" + nonce + "\n" + string(signBody) + "\n"
+
+	// 不吞这个错误：sign 头缺失或被截断时，解出来是空/半截 bytes，
+	// 后面 Verify 一样会失败，但报的是"签名不匹配"，
+	// 让人去查密钥和报文，而真正的原因是压根没收到签名
+	signBytes, err := base64.StdEncoding.DecodeString(sign)
+	if err != nil {
+		return fmt.Errorf("[%w]: decode alipay-signature header err: %v", gopay.VerifySignatureErr, err)
+	}
+	sum256 := sha256.Sum256([]byte(signData))
+	if err = rsa.VerifyPKCS1v15(a.aliPayPublicKey, crypto.SHA256, sum256[:], signBytes); err != nil {
+		return fmt.Errorf("[%w]: %v", gopay.VerifySignatureErr, err)
 	}
 	return nil
 }
