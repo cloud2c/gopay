@@ -5,20 +5,29 @@ import "net/http"
 const (
 	Success = http.StatusOK
 
-	MethodGet           = "GET"
-	MethodPost          = "POST"
-	MethodPut           = "PUT"
-	MethodDelete        = "DELETE"
-	MethodPatch         = "PATCH"
-	HeaderAuthorization   = "Authorization"
-	HeaderRequestID       = "alipay-request-id"
-	HeaderSdkVersion      = "alipay-sdk-version"
-	HeaderAppAuthToken    = "alipay-app-auth-token"
-	HeaderTimestamp       = "alipay-timestamp"
-	HeaderNonce           = "alipay-nonce"
-	HeaderSignature       = "alipay-signature"
-	HeaderEncryptType     = "alipay-encrypt-type"     // V3 内容加密类型（如 AES）
-	HeaderContentEncrypt  = "alipay-content-encrypt"  // V3 响应内容加密标识
+	MethodGet            = "GET"
+	MethodPost           = "POST"
+	MethodPut            = "PUT"
+	MethodDelete         = "DELETE"
+	MethodPatch          = "PATCH"
+	HeaderAuthorization  = "Authorization"
+	HeaderRequestID      = "alipay-request-id"
+	HeaderSdkVersion     = "alipay-sdk-version"
+	HeaderAppAuthToken   = "alipay-app-auth-token"
+	HeaderTimestamp      = "alipay-timestamp"
+	HeaderNonce          = "alipay-nonce"
+	HeaderSignature      = "alipay-signature"
+	HeaderEncryptType    = "alipay-encrypt-type"    // V3 内容加密类型（如 AES）
+	HeaderContentEncrypt = "alipay-content-encrypt" // V3 响应内容加密标识
+	// HeaderRootCertSN 支付宝根证书序列号，**证书模式下必填**。
+	// 官方「签名规则」的请求头格式示例：
+	//   Authorization: ${签名算法} ${authString},sign=${signature}
+	//   alipay-root-cert-sn: ${alipayRootCertSn}
+	// 注意 app_cert_sn 不在这里，它拼在 authString 里（见 authorization）。
+	HeaderRootCertSN = "alipay-root-cert-sn"
+	// HeaderAliPaySN 响应头，支付宝本次使用的证书号，证书模式下返回。
+	// 官方要求商家确保本地支付宝证书与它一致，不一致需更新支付宝公钥证书。
+	HeaderAliPaySN = "alipay-sn"
 
 	SignTypeRSA = "ALIPAY-SHA256withRSA"
 

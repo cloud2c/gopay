@@ -98,6 +98,10 @@ func (a *ClientV3) doPost(ctx context.Context, bm gopay.BodyMap, uri, aat string
 
 	req := a.hc.Req() // default json
 	req.Header.Add(HeaderAuthorization, authorization)
+	// 证书模式必须带上根证书序列号，公钥（密钥）模式下 AliPayRootCertSN 为空，跳过
+	if a.AliPayRootCertSN != gopay.NULL {
+		req.Header.Add(HeaderRootCertSN, a.AliPayRootCertSN)
+	}
 	req.Header.Add(HeaderRequestID, a.requestIdFunc.RequestId())
 	req.Header.Add(HeaderSdkVersion, "gopay/"+gopay.Version)
 	// V3 内容加密：添加 alipay-encrypt-type Header，并将 Content-Type 设为 text/plain
@@ -163,6 +167,10 @@ func (a *ClientV3) doPatch(ctx context.Context, bm gopay.BodyMap, uri, aat strin
 	}
 	req := a.hc.Req() // default json
 	req.Header.Add(HeaderAuthorization, authorization)
+	// 证书模式必须带上根证书序列号，公钥（密钥）模式下 AliPayRootCertSN 为空，跳过
+	if a.AliPayRootCertSN != gopay.NULL {
+		req.Header.Add(HeaderRootCertSN, a.AliPayRootCertSN)
+	}
 	req.Header.Add(HeaderRequestID, a.requestIdFunc.RequestId())
 	req.Header.Add(HeaderSdkVersion, "gopay/"+gopay.Version)
 	if aat != gopay.NULL {
@@ -203,6 +211,10 @@ func (a *ClientV3) doPut(ctx context.Context, bm gopay.BodyMap, uri, aat string)
 	}
 	req := a.hc.Req() // default json
 	req.Header.Add(HeaderAuthorization, authorization)
+	// 证书模式必须带上根证书序列号，公钥（密钥）模式下 AliPayRootCertSN 为空，跳过
+	if a.AliPayRootCertSN != gopay.NULL {
+		req.Header.Add(HeaderRootCertSN, a.AliPayRootCertSN)
+	}
 	req.Header.Add(HeaderRequestID, a.requestIdFunc.RequestId())
 	req.Header.Add(HeaderSdkVersion, "gopay/"+gopay.Version)
 	if aat != gopay.NULL {
@@ -243,6 +255,10 @@ func (a *ClientV3) doGet(ctx context.Context, uri, aat string) (res *http.Respon
 	}
 	req := a.hc.Req() // default json
 	req.Header.Add(HeaderAuthorization, authorization)
+	// 证书模式必须带上根证书序列号，公钥（密钥）模式下 AliPayRootCertSN 为空，跳过
+	if a.AliPayRootCertSN != gopay.NULL {
+		req.Header.Add(HeaderRootCertSN, a.AliPayRootCertSN)
+	}
 	req.Header.Add(HeaderRequestID, a.requestIdFunc.RequestId())
 	req.Header.Add(HeaderSdkVersion, "gopay/"+gopay.Version)
 	if aat != gopay.NULL {
@@ -315,6 +331,10 @@ func (a *ClientV3) doProdPostFile(ctx context.Context, bm gopay.BodyMap, uri, aa
 	}
 	req := a.hc.Req(xhttp.TypeMultipartFormData)
 	req.Header.Add(HeaderAuthorization, authorization)
+	// 证书模式必须带上根证书序列号，公钥（密钥）模式下 AliPayRootCertSN 为空，跳过
+	if a.AliPayRootCertSN != gopay.NULL {
+		req.Header.Add(HeaderRootCertSN, a.AliPayRootCertSN)
+	}
 	req.Header.Add(HeaderRequestID, a.requestIdFunc.RequestId())
 	req.Header.Add(HeaderSdkVersion, "gopay/"+gopay.Version)
 	if aat != gopay.NULL {
@@ -354,6 +374,10 @@ func (a *ClientV3) doDelete(ctx context.Context, bm gopay.BodyMap, uri, aat stri
 	}
 	req := a.hc.Req() // default json
 	req.Header.Add(HeaderAuthorization, authorization)
+	// 证书模式必须带上根证书序列号，公钥（密钥）模式下 AliPayRootCertSN 为空，跳过
+	if a.AliPayRootCertSN != gopay.NULL {
+		req.Header.Add(HeaderRootCertSN, a.AliPayRootCertSN)
+	}
 	req.Header.Add(HeaderRequestID, a.requestIdFunc.RequestId())
 	req.Header.Add(HeaderSdkVersion, "gopay/"+gopay.Version)
 	if aat != gopay.NULL {

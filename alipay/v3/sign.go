@@ -116,6 +116,19 @@ func (a *ClientV3) autoVerifySignByCert(res *http.Response, body []byte) (err er
 	nonce := res.Header.Get(HeaderNonce)
 	sign := res.Header.Get(HeaderSignature)
 
+	// 证书模式下支付宝会回 alipay-sn，标明它本次用的是哪本证书。
+	// 官方要求商家确保本地支付宝证书与它一致，不一致需要更新支付宝公钥证书。
+	//
+	// 单独报出来，而不是让它掉进下面的验签失败：证书轮换后本地公钥必然对不上，
+	// 报「签名不匹配」会把人引去查密钥和报文，而实际要做的是换一本证书。
+	//
+	// 两边任一为空就跳过：公钥（密钥）模式下支付宝不回这个头，
+	// AliPayPublicCertSN 也为空，不该拿它当失败条件。
+	if aliSN := res.Header.Get(HeaderAliPaySN); aliSN != gopay.NULL &&
+		a.AliPayPublicCertSN != gopay.NULL && aliSN != a.AliPayPublicCertSN {
+		return fmt.Errorf("[%w]: alipay cert sn mismatch, response=%s, local=%s. "+
+			"请更新本地支付宝公钥证书", gopay.VerifySignatureErr, aliSN, a.AliPayPublicCertSN)
+	}
 	if a.DebugSwitch == gopay.DebugOn {
 		a.logger.Debugf("Alipay_VerifySignHeader: alipay-timestamp=[%s], alipay-nonce=[%s], alipay-signature=[%s]", ts, nonce, sign)
 	}
