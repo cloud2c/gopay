@@ -1,5 +1,84 @@
 # Changelog
 
+## v1.5.122
+
+Alipay V3 signing and verification, corrected against the official V3 protocol
+docs. Three of the four items are cases where a valid response failed, or an
+invalid one passed, without saying why.
+
+### Fix: AES Response Ciphertext Stored on the Shared Client
+
+With an AES key set, the V3 response signature is computed over the ciphertext,
+but `doPost` decrypts the body in place. The ciphertext used to be held in
+`ClientV3.rawBodyForSign` — written by `doPost`, read and cleared by
+`autoVerifySignByCert` — with no synchronization.
+
+`ClientV3` is a long-lived shared instance, so this was a data race (`go test
+-race` reports two) and it also produced wrong results under concurrency:
+
+- response B overwrites A's ciphertext, so A verifies against B's body
+- A clears the field, so B falls back to the plaintext
+
+Both surface as "signature verification failed" on valid payloads: fine at low
+volume, random failures under load.
+
+The ciphertext is now attached to the response's own `Request` context, scoped
+per response. Supersedes the approach introduced in v1.5.119.
+
+Also stopped swallowing the base64 decode error of the `alipay-signature`
+header, which previously reported a missing header as a signature mismatch.
+
+### Fix: Send alipay-root-cert-sn Header in Cert Mode
+
+The [official signing rules](https://opendocs.alipay.com/open-v3/054q58) require
+the Alipay root certificate serial number as its own header in certificate mode:
+
+```
+Authorization: ${signAlgorithm} ${authString},sign=${signature}
+alipay-root-cert-sn: ${alipayRootCertSn}
+```
+
+V3 never sent it — `AliPayRootCertSN` was parsed by `SetCert` and then only used
+by the V1-style gateway payloads in `payment_api.go`. Every V3 REST call in cert
+mode went out missing a required header. Added to all six `do*` methods; key mode
+leaves the field empty so the header is skipped.
+
+`app_cert_sn` is *not* a header; it belongs inside `authString`, which
+`authorization()` already did correctly.
+
+### Fix: Report Cert Serial Mismatch Instead of a Signature Failure
+
+Cert mode returns the serial Alipay signed with in the `alipay-sn` response
+header, and the [verification rules](https://opendocs.alipay.com/open-v3/054d0z)
+require merchants to compare it with their local certificate. Without the check,
+a certificate rotation looks like "signature verification failed" on a valid
+response, sending people to inspect keys and payloads when the fix is to replace
+the certificate. Skipped when either side is empty (key mode has neither).
+
+### Feat: Verify Responses in Key Mode
+
+Per [接口加签方式](https://opendocs.alipay.com/open-v3/05419m) the two signing
+modes are key mode (app private key, app public key, Alipay public key) and
+certificate mode; one APPID may configure only one, and everything except
+fund-transfer scenarios may use key mode.
+
+V3 could not verify responses in key mode at all: `SetCert` was the only entry
+point that populated `aliPayPublicKey`, so `autoVerifySignByCert` returned nil
+and responses went unverified — silently.
+
+```go
+client, _ := alipay.NewClientV3(appId, privateKey, isProd)
+client.SetAliPayPublicKey([]byte(alipayPublicKey)) // PEM or raw base64
+client.SetVerifyRequired(true)                     // fail instead of skipping
+```
+
+`SetVerifyRequired` defaults to `false` so existing callers are unaffected;
+`Clone` carries both settings over. Recommended for payment integrations.
+
+New `alipay/v3/cert_mode_test.go` and `raw_body_test.go` cover the root cert
+header in both modes, the `alipay-sn` mismatch error, the new setter and the
+per-response ciphertext. Run with `-race`.
+
 ## v1.5.121
 
 ### Feat: Sync Alipay APIs from upstream

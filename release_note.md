@@ -1,3 +1,20 @@
+## 版本号：v1.5.122
+
+* 修改记录：
+  * 支付宝v3：修复开启 AES 加密后，验签用的密文存在共享 client 字段上导致的数据竞争。
+    * ClientV3 是长期共享实例，rawBodyForSign 由 doPost 写、autoVerifySignByCert 读后清空，全程无锁，`go test -race` 会报两处 DATA RACE。
+    * 并发下结果也是错的：后到的响应会覆盖先到的密文，先到的读完又把字段清空，两边都报「验签失败」，而报文本身正常——量小时偶尔能过，一上并发开始随机失败。
+    * 密文改为挂在响应自身的 Request context 上，按响应隔离，随响应回收。v1.5.119 引入的做法就此作废。
+  * 支付宝v3：alipay-signature 响应头的 base64 解码错误不再被吞掉。原先头缺失或被截断会解出空 bytes，最终报成「签名不匹配」，把排查引向密钥和报文。
+  * 支付宝v3：修复证书模式下漏发 alipay-root-cert-sn 请求头。官方签名规则要求证书模式必须用独立请求头传支付宝根证书序列号，而 v3 从来没发过——AliPayRootCertSN 被 SetCert 解析出来后只用在 payment_api.go 的老网关参数里。六个 do* 方法全部补上；密钥模式该字段为空，不发。
+    * 注意 app_cert_sn 不是请求头，它拼在 authString 里，这部分原本就是对的。
+  * 支付宝v3：证书模式下校验响应头 alipay-sn，与本地支付宝公钥证书序列号不一致时直接报「请更新证书」。原先会掉进验签失败报「签名不匹配」，把排查引向密钥和报文，而实际要做的是换证书。两边任一为空（密钥模式）时跳过。
+  * 支付宝v3：新增 client.SetAliPayPublicKey() 与 client.SetVerifyRequired()，补齐密钥（公钥）模式的验签能力。
+    * 此前 v3 只有 SetCert 会设置支付宝公钥，密钥模式下响应完全不验签且不报错。SetAliPayPublicKey 支持带 PEM 头的公钥，也支持控制台拷出来的裸 base64。
+    * SetVerifyRequired(true) 让「没有支付宝公钥」从静默跳过变成显式报错，默认 false 不影响既有调用方，Clone() 会带上这两项配置。
+
+
+
 ## 版本号：v1.5.121
 
 * 修改记录：
