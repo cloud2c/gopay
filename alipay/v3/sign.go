@@ -112,9 +112,12 @@ func (a *ClientV3) autoVerifySignByCert(res *http.Response, body []byte) (err er
 		// 没有支付宝公钥 = 没法验签。默认沿用历史行为直接放过，
 		// 但这意味着响应是**未经验证**的，调用方可以用 SetVerifyRequired(true) 要求拦下来。
 		if a.verifyRequired {
-			return fmt.Errorf("[%w]: alipay public key not set, call SetCert first "+
-				"(v3 只能通过 SetCert 设置支付宝公钥)", gopay.VerifySignatureErr)
+			return fmt.Errorf("[%w]: alipay public key not set, call SetCert (cert mode) "+
+				"or SetAliPayPublicKey (key mode) first; "+
+				"pass SetVerifyRequired(false) only if you accept unverified responses",
+				gopay.VerifySignatureErr)
 		}
+		// 走到这里说明调用方显式关掉了验签要求，响应是**未经验证**的
 		return nil
 	}
 	ts := res.Header.Get(HeaderTimestamp)

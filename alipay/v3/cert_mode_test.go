@@ -144,6 +144,42 @@ func TestSetAliPayPublicKeyEnablesVerification(t *testing.T) {
 	}
 }
 
+// v1.5.123 起默认要求验签：没配支付宝公钥就报错，而不是静默放过一个未验证的响应。
+func TestVerifyRequiredDefaultsToTrue(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(HeaderTimestamp, "1")
+		w.Header().Set(HeaderNonce, "n")
+		w.Header().Set(HeaderSignature, "AA==")
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("{}"))
+	}))
+	defer srv.Close()
+
+	c, _ := newTestClientV3(t, srv.URL) // 既没 SetCert 也没 SetAliPayPublicKey
+	if !c.verifyRequired {
+		t.Fatal("NewClientV3 应当默认要求验签")
+	}
+
+	res, bs, err := c.doPost(context.Background(), gopay.BodyMap{"a": "b"}, "/v3/x", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := c.autoVerifySignByCert(res, bs); err == nil {
+		t.Fatal("没有支付宝公钥却放过了响应")
+	}
+
+	// 显式关掉才回到「静默放过」，用于排障或未配密钥的沙箱
+	c.SetVerifyRequired(false)
+	if err := c.autoVerifySignByCert(res, bs); err != nil {
+		t.Errorf("显式关闭后不该报错: %v", err)
+	}
+
+	// Clone 要带上这个配置，否则副本会悄悄换一种行为
+	if c.Clone().verifyRequired != false {
+		t.Error("Clone 没有继承 verifyRequired")
+	}
+}
+
 func contains(s, sub string) bool {
 	for i := 0; i+len(sub) <= len(s); i++ {
 		if s[i:i+len(sub)] == sub {

@@ -58,6 +58,9 @@ func NewClientV3(appid, privateKey string, isProd bool) (client *ClientV3, err e
 		logger:        logger,
 		requestIdFunc: defaultRequestIdFunc,
 		hc:            xhttp.NewClient(),
+		// 默认要求验签。没有支付宝公钥就报错，而不是静默地不验证响应，
+		// 详见 SetVerifyRequired
+		verifyRequired: true,
 	}
 	return client, nil
 }
@@ -192,20 +195,22 @@ func (a *ClientV3) SetAliPayPublicKey(publicKey []byte) (err error) {
 	return nil
 }
 
-// SetVerifyRequired 要求同步响应必须验签，没有支付宝公钥就直接报错。
+// SetVerifyRequired 控制「没有支付宝公钥时」的行为。
 //
-// 默认是 false，也就是**未配置证书时 autoVerifySignByCert 什么都不做、返回 nil**。
-// 那是历史行为，为了不打断只用公钥模式的调用方，这里没有直接改默认值。
+// **默认 true**：没有公钥就报错，因为此时根本没法验签，继续下去等于接受一个
+// 未经验证的响应。v1.5.123 起改成这个默认值，此前默认 false（静默放过）。
 //
-// 但要清楚这个默认值的含义：v3 里给 aliPayPublicKey 赋值的入口**只有 SetCert**，
-// 没有别的方法能设支付宝公钥。所以「公钥模式」在 v3 上等价于**响应完全不验签**，
-// 而且是静默的 —— 调用方拿到的 err 是 nil，看起来一切正常。
+// 之所以这是个容易踩的坑：v3 里给支付宝公钥赋值的入口只有两个 ——
+// SetCert（证书模式）和 SetAliPayPublicKey（密钥模式）。两个都没调的话，
+// 旧版本会让每一个响应都不验签通过，而调用方拿到的 err 是 nil，看起来一切正常。
 //
-// 对接支付这种场景建议显式打开：
+// 正常接入不需要调这个方法，配好证书或公钥即可：
 //
 //	client, _ := alipay.NewClientV3(appId, privateKey, isProd)
-//	client.SetCert(appCert, rootCert, alipayCert)
-//	client.SetVerifyRequired(true)   // 漏配证书时立刻暴露，而不是一路不验签
+//	client.SetCert(appCert, rootCert, alipayCert)       // 或 SetAliPayPublicKey(...)
+//
+// 只有在明确接受「响应不验签」时才传 false，比如临时排障或对接一个还没配好
+// 密钥的沙箱应用。生产环境不要关。
 //
 // 必须在并发使用之前设置好（和 SetCert 一样，属于初始化期配置）。
 func (a *ClientV3) SetVerifyRequired(required bool) *ClientV3 {
