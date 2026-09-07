@@ -1,5 +1,29 @@
 # Changelog
 
+## v1.5.123
+
+### Feat!: Require Response Signature Verification by Default
+
+**BREAKING CHANGE.** `NewClientV3` now sets `verifyRequired` to `true`. A client
+with neither `SetCert` nor `SetAliPayPublicKey` configured fails on the first
+call instead of silently accepting unverified responses.
+
+The old default existed to avoid breaking callers, but it made the failure mode
+invisible: `aliPayPublicKey` is populated only by those two methods, and with
+neither of them every response passed verification with a `nil` error. A payment
+SDK that quietly stops verifying signatures is the wrong side to err on.
+
+Correctly configured clients are unaffected. Callers who genuinely accept
+unverified responses — temporary debugging, a sandbox app with no keys yet —
+opt out explicitly:
+
+```go
+client.SetVerifyRequired(false) // responses are NOT verified
+```
+
+The error message now names both entry points rather than only `SetCert`, and
+points at the opt-out.
+
 ## v1.5.122
 
 Alipay V3 signing and verification, corrected against the official V3 protocol
