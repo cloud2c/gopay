@@ -108,8 +108,13 @@ func (a *ClientV3) rsaSign(str string) (string, error) {
 // =============================== 同步验签 ===============================
 
 func (a *ClientV3) autoVerifySignByCert(res *http.Response, body []byte) (err error) {
-	// 没有支付宝公钥就没法验签，直接放过
 	if a.aliPayPublicKey == nil {
+		// 没有支付宝公钥 = 没法验签。默认沿用历史行为直接放过，
+		// 但这意味着响应是**未经验证**的，调用方可以用 SetVerifyRequired(true) 要求拦下来。
+		if a.verifyRequired {
+			return fmt.Errorf("[%w]: alipay public key not set, call SetCert first "+
+				"(v3 只能通过 SetCert 设置支付宝公钥)", gopay.VerifySignatureErr)
+		}
 		return nil
 	}
 	ts := res.Header.Get(HeaderTimestamp)

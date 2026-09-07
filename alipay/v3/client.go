@@ -1,7 +1,9 @@
 package alipay
 
 import (
+	"bytes"
 	"crypto/rsa"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -30,6 +32,7 @@ type ClientV3 struct {
 	logger             xlog.XLogger
 	requestIdFunc      xhttp.RequestIdHandler
 	hc                 *xhttp.Client
+	verifyRequired     bool // 见 SetVerifyRequired
 }
 
 // NewClientV3 初始化支付宝客户端 V3
@@ -155,6 +158,61 @@ func (a *ClientV3) SetAESKey(aesKey string) *ClientV3 {
 	return a
 }
 
+// SetAliPayPublicKey 公钥模式：直接设置**支付宝公钥**（不是证书），用于同步响应验签。
+//
+// 与 SetCert 是二选一的两种模式：
+//
+//	证书模式  SetCert()             app_cert_sn 进签名串，验签用证书里的公钥
+//	公钥模式  SetAliPayPublicKey()  不带 app_cert_sn，验签用这里给的公钥
+//
+// 在此之前 v3 只有 SetCert 会给 aliPayPublicKey 赋值，公钥模式下
+// autoVerifySignByCert 会直接 return nil —— 也就是**响应完全不验签**，
+// 而且是静默的。补上这个入口后，公钥模式才真正能验签。
+//
+// publicKey 支持带 PEM 头的完整公钥，也支持支付宝控制台直接拷出来的裸 base64
+// （内部会补 PEM 头）。
+//
+// 注意别和 SetCert 同时调：后调用的会覆盖 aliPayPublicKey，而 AppCertSN
+// 只有 SetCert 会设，混着用会得到「带 app_cert_sn 但用普通公钥验签」这种
+// 支付宝不认的组合。
+func (a *ClientV3) SetAliPayPublicKey(publicKey []byte) (err error) {
+	if len(publicKey) == 0 {
+		return errors.New("alipay public key is empty")
+	}
+	key := publicKey
+	// 裸 base64 补上 PEM 头，和 NewClientV3 处理私钥的方式一致
+	if !bytes.Contains(key, []byte("-----BEGIN")) {
+		key = []byte(xrsa.FormatAlipayPublicKey(string(key)))
+	}
+	pubKey, err := xpem.DecodePublicKey(key)
+	if err != nil {
+		return fmt.Errorf("decode alipay public key err: %w", err)
+	}
+	a.aliPayPublicKey = pubKey
+	return nil
+}
+
+// SetVerifyRequired 要求同步响应必须验签，没有支付宝公钥就直接报错。
+//
+// 默认是 false，也就是**未配置证书时 autoVerifySignByCert 什么都不做、返回 nil**。
+// 那是历史行为，为了不打断只用公钥模式的调用方，这里没有直接改默认值。
+//
+// 但要清楚这个默认值的含义：v3 里给 aliPayPublicKey 赋值的入口**只有 SetCert**，
+// 没有别的方法能设支付宝公钥。所以「公钥模式」在 v3 上等价于**响应完全不验签**，
+// 而且是静默的 —— 调用方拿到的 err 是 nil，看起来一切正常。
+//
+// 对接支付这种场景建议显式打开：
+//
+//	client, _ := alipay.NewClientV3(appId, privateKey, isProd)
+//	client.SetCert(appCert, rootCert, alipayCert)
+//	client.SetVerifyRequired(true)   // 漏配证书时立刻暴露，而不是一路不验签
+//
+// 必须在并发使用之前设置好（和 SetCert 一样，属于初始化期配置）。
+func (a *ClientV3) SetVerifyRequired(required bool) *ClientV3 {
+	a.verifyRequired = required
+	return a
+}
+
 // WithoutAES 返回一个新的 Client 副本，不启用 AES 加密
 // 原 Client 实例不受任何影响，此方法线程安全
 //
@@ -199,6 +257,7 @@ func (a *ClientV3) Clone() *ClientV3 {
 		aesKey:             "", // 克隆时不继承 AES Key，避免误用
 		encryptType:        "",
 		proxyHost:          a.proxyHost,
+		verifyRequired:     a.verifyRequired,
 		privateKey:         a.privateKey,
 		aliPayPublicKey:    a.aliPayPublicKey,
 		DebugSwitch:        a.DebugSwitch,
