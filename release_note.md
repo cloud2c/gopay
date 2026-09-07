@@ -1,3 +1,44 @@
+## 版本号：v1.5.121
+
+* 修改记录：
+  * 支付宝v3：从上游同步 4 个接口模块共 25 个接口。
+    * 广告（ad_api.go）：转化数据上传、广告报表查询、推广页管理、任务广告查询。
+    * 费率（fee_api.go）：特殊费率申请。
+    * 风险（risk_api.go）：消费者投诉处理、营销风险识别、行业风险识别、内容风险检测。
+    * 订阅（subscription_api.go）：商品/价格/客户/订阅的增删改查。
+  * gopay：文档示例中的 import 路径统一改为 github.com/cloud2c/gopay。
+
+
+
+## 版本号：v1.5.120
+
+* 修改记录：
+  * 支付宝v3：新增 client.WithoutAES() 与 client.Clone()，用于混合加密场景。
+    * 人脸核身、OCR 类接口要求 biz_content 走 AES 加密；而支付类接口（TradeCreate、TradePay 等）不支持内容加密，设了 AES Key 反而会报参数错误。
+    * WithoutAES() 返回不带 AES 的新实例，原 client 不受影响；Clone() 返回独立副本且不继承 AES 配置。两者都是并发安全的。
+
+
+
+## 版本号：v1.5.119
+
+* 修改记录：
+  * 支付宝v3：修复开启 AES 内容加密后同步验签失败（crypto/rsa: verification error）的问题。
+    * 支付宝签的是**密文**响应，而 SDK 拿解密后的明文去验签。
+    * 改为在解密前保留原始密文供验签使用；同时去掉对 alipay-content-encrypt 响应头的依赖——部分接口返回加密内容却不带该头，会导致解密被跳过。
+    * 注：本次引入的实现把密文存在 client 字段上，存在并发问题，已在 v1.5.122 重做。
+
+
+
+## 版本号：v1.5.118
+
+* 修改记录：
+  * 支付宝v3：**不兼容变更** —— 内部 do* 方法统一不再接收 authorization 参数，签名改为自动计算。
+    * doPost 在设置了 aesKey 时自动加密请求体并对密文签名（先加密后签名），不再需要 doPostWithEncrypt，该方法已移除。
+    * authorizationWithEncryptBody 合并进 authorization，改用 encryptedBody 参数区分。
+    * doProdPostFile 完全内部化：文件分离、data 字段编码与签名都在内部完成，调用方只传原始 BodyMap。
+
+
+
 ## 版本号：v1.5.117
 
 * 修改记录：
@@ -32,6 +73,21 @@
   * 支付宝v3：新增 client.MarketingCampaignOrderVoucherConsult()，订单优惠前置咨询接口。
   * 支付宝v3：删除已下架接口 client.MarketingQipanCrowdOperationCreate()。
   * 支付宝v3：修复多个棋盘密云接口的必传参数和响应结构体字段，确保与官方文档一致。
+
+
+
+## 版本号：v1.5.115
+
+* 修改记录：
+  * 微信v3：新增 付款码支付 相关接口。
+    * client.V3TransactionCodePay()，付款码支付。
+    * client.V3TransactionCodePayReverse()，付款码支付撤销订单。
+    * client.V3PartnerTransactionCodePay()，服务商付款码支付。
+    * client.V3PartnerTransactionCodePayReverse()，服务商付款码支付撤销订单。
+  * 支付宝v3：新增 client.TradeWapPay()，手机网站支付，与 client.TradePagePay() 共用内部实现。
+  * 支付宝v3：修复 client.TradePagePay() 的 method 误写成 alipay.trade.app.pay。
+  * 微信：EntrustAppPreResponse 结构体补充小程序相关字段。
+  * 苹果支付：NotificationTypeV2 增加一次性购买的通知类型常量。
 
 
 
