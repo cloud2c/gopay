@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.5.124
+
+### Fix!: Verify Server Certificates by Default in HTTP Client
+
+**BREAKING CHANGE.** The default HTTP client (`pkg/xhttp`) no longer sets
+`InsecureSkipVerify`; server certificates are verified for every request.
+Two-way certificate configurations (WeChat and QQ) keep the client certificate
+but no longer skip verification of the server.
+
+Sandbox or test environments with self-signed certificates opt out explicitly:
+
+```go
+client.SetTLSVerify(false) // testing only, never in production
+```
+
+### Feat: Explicit TLS Verification Toggle
+
+`xhttp.Client.SetTLSVerify(bool)` sets verification explicitly; default `true`.
+
+### Chore: Upgrade golang.org/x/crypto to v0.53.0
+
+`go` directive is raised to 1.25.0 as required by x/crypto v0.53.0.
+
 ## v1.5.123
 
 ### Feat!: Require Response Signature Verification by Default
