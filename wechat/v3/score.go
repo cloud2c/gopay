@@ -29,7 +29,7 @@ func (c *ClientV3) V3ScoreDirectComplete(ctx context.Context, bm gopay.BodyMap) 
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -53,7 +53,7 @@ func (c *ClientV3) V3ScorePermission(ctx context.Context, bm gopay.BodyMap) (wxR
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -78,7 +78,7 @@ func (c *ClientV3) V3ScorePermissionQuery(ctx context.Context, authCode, service
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -128,7 +128,7 @@ func (c *ClientV3) V3ScorePermissionOpenidQuery(ctx context.Context, appid, open
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -178,7 +178,7 @@ func (c *ClientV3) V3ScoreOrderCreate(ctx context.Context, bm gopay.BodyMap) (wx
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -203,7 +203,7 @@ func (c *ClientV3) V3ScoreOrderPartnerCreate(ctx context.Context, bm gopay.BodyM
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -236,7 +236,7 @@ func (c *ClientV3) V3ScoreOrderQuery(ctx context.Context, orderNoType OrderNoTyp
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -273,7 +273,7 @@ func (c *ClientV3) V3ScoreOrderPartnerQuery(ctx context.Context, orderNoType Ord
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -302,7 +302,7 @@ func (c *ClientV3) V3ScoreOrderCancel(ctx context.Context, appid, tradeNo, servi
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -332,7 +332,7 @@ func (c *ClientV3) V3ScoreOrderPartnerCancel(ctx context.Context, subMchid, trad
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	return wxRsp, c.verifySyncSign(si)
 }
@@ -354,7 +354,7 @@ func (c *ClientV3) V3ScoreOrderModify(ctx context.Context, tradeNo string, bm go
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -379,7 +379,7 @@ func (c *ClientV3) V3ScoreOrderComplete(ctx context.Context, tradeNo string, bm 
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -430,7 +430,7 @@ func (c *ClientV3) V3ScoreOrderPay(ctx context.Context, appid, tradeNo, servicei
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -455,7 +455,7 @@ func (c *ClientV3) V3ScoreOrderSync(ctx context.Context, tradeNo string, bm gopa
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))

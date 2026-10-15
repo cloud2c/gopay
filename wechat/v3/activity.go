@@ -29,7 +29,7 @@ func (c *ClientV3) V3PayGiftActivityCreate(ctx context.Context, bm gopay.BodyMap
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -54,7 +54,7 @@ func (c *ClientV3) V3PayGiftActivityList(ctx context.Context, bm gopay.BodyMap) 
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -79,7 +79,7 @@ func (c *ClientV3) V3PayGiftActivityDetail(ctx context.Context, activityId strin
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -104,7 +104,7 @@ func (c *ClientV3) V3PayGiftActivityGoods(ctx context.Context, activityId string
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -129,7 +129,7 @@ func (c *ClientV3) V3PayGiftActivityTerminate(ctx context.Context, activityId st
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -154,7 +154,7 @@ func (c *ClientV3) V3PayGiftActivityMerchant(ctx context.Context, activityId str
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -182,7 +182,7 @@ func (c *ClientV3) V3PayGiftActivityMerchantAdd(ctx context.Context, activityId 
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -210,7 +210,7 @@ func (c *ClientV3) V3PayGiftActivityMerchantDelete(ctx context.Context, activity
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))

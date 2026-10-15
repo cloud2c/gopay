@@ -28,7 +28,7 @@ func (c *ClientV3) V3EcommerceBalance(ctx context.Context, subMchid string, bm g
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -54,7 +54,7 @@ func (c *ClientV3) V3EcommerceDayBalance(ctx context.Context, subMchid, date str
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -80,7 +80,7 @@ func (c *ClientV3) V3MerchantBalance(ctx context.Context, accountType string) (*
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -107,7 +107,7 @@ func (c *ClientV3) V3MerchantDayBalance(ctx context.Context, accountType, date s
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -132,7 +132,7 @@ func (c *ClientV3) V3EcommerceIncomeRecord(ctx context.Context, bm gopay.BodyMap
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -157,7 +157,7 @@ func (c *ClientV3) V3MerchantIncomeRecord(ctx context.Context, bm gopay.BodyMap)
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))

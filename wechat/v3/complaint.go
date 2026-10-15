@@ -29,7 +29,7 @@ func (c *ClientV3) V3ComplaintNotifyUrlCreate(ctx context.Context, url string) (
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	wxRsp.Response = new(ComplaintNotifyUrl)
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
@@ -54,7 +54,7 @@ func (c *ClientV3) V3ComplaintNotifyUrlQuery(ctx context.Context) (wxRsp *Compla
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	wxRsp.Response = new(ComplaintNotifyUrl)
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
@@ -81,7 +81,7 @@ func (c *ClientV3) V3ComplaintNotifyUrlUpdate(ctx context.Context, url string) (
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	wxRsp.Response = new(ComplaintNotifyUrl)
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
@@ -135,7 +135,7 @@ func (c *ClientV3) V3ComplaintUploadImage(ctx context.Context, fileName, fileSha
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	wxRsp.Response = new(MediaUpload)
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
@@ -162,7 +162,7 @@ func (c *ClientV3) V3ComplaintImage(ctx context.Context, mediaId string) (wxRsp 
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if strings.HasPrefix(contentType, "image/") {
 		wxRsp.ImageData = bs
@@ -192,7 +192,7 @@ func (c *ClientV3) V3ComplaintList(ctx context.Context, bm gopay.BodyMap) (wxRsp
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	wxRsp.Response = new(ComplaintList)
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
@@ -218,7 +218,7 @@ func (c *ClientV3) V3ComplaintNegotiationHistory(ctx context.Context, complaintI
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	wxRsp.Response = new(ComplaintNegotiationHistory)
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
@@ -244,7 +244,7 @@ func (c *ClientV3) V3ComplaintDetail(ctx context.Context, complaintId string) (w
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	wxRsp.Response = new(ComplaintDetail)
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
@@ -318,7 +318,7 @@ func (c *ClientV3) V3ComplaintResponseImmediateService(ctx context.Context, comp
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))

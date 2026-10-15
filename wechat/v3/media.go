@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/go-pay/util/js"
 	"net/http"
@@ -29,7 +28,9 @@ func (c *ClientV3) V3MediaDownloadImage(ctx context.Context, mediaUrl string) (r
 		return nil, err
 	}
 	if res.StatusCode != http.StatusOK {
-		return nil, errors.New(string(bs))
+		var errRsp ErrResponse
+		_ = js.UnmarshalBytes(bs, &errRsp)
+		return nil, bizErr(res.StatusCode, errRsp)
 	}
 	resBody = bytes.NewBuffer(bs)
 	return resBody, c.verifySyncSign(si)
@@ -59,7 +60,7 @@ func (c *ClientV3) V3MediaUploadImage(ctx context.Context, fileName, fileSha256 
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))
@@ -91,7 +92,7 @@ func (c *ClientV3) V3MediaUploadVideo(ctx context.Context, fileName, fileSha256 
 		wxRsp.Code = res.StatusCode
 		wxRsp.Error = string(bs)
 		_ = js.UnmarshalBytes(bs, &wxRsp.ErrResponse)
-		return wxRsp, nil
+		return wxRsp, bizErr(res.StatusCode, wxRsp.ErrResponse)
 	}
 	if err = json.Unmarshal(bs, wxRsp.Response); err != nil {
 		return nil, fmt.Errorf("[%w]: %v, bytes: %s", gopay.UnmarshalErr, err, string(bs))

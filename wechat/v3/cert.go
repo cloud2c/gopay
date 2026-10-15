@@ -116,7 +116,7 @@ func GetPlatformCerts(ctx context.Context, mchid, apiV3Key, serialNo, privateKey
 		_ = js.UnmarshalBytes(bs, &certs.ErrResponse)
 		certs.Code = res.StatusCode
 		certs.Error = string(bs)
-		return certs, nil
+		return certs, bizErr(res.StatusCode, certs.ErrResponse)
 	}
 	// Parse
 	certRsp := new(PlatformCert)
@@ -301,7 +301,7 @@ func (c *ClientV3) getPlatformCerts(certType ...CertType) (certs *PlatformCertRs
 	if res.StatusCode != http.StatusOK {
 		certs.Code = res.StatusCode
 		certs.Error = string(bs)
-		return certs, nil
+		return certs, bizErr(res.StatusCode, certs.ErrResponse)
 	}
 	certRsp := new(PlatformCert)
 	if err = json.Unmarshal(bs, certRsp); err != nil {

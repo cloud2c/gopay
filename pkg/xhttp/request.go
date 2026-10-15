@@ -148,97 +148,68 @@ func (r *Request) EndBytesForAlipayV3(ctx context.Context) (res *http.Response, 
 	if r.err != nil {
 		return nil, nil, r.err
 	}
-	var (
-		body io.Reader
-		bw   *multipart.Writer
-	)
-	// multipart-form-data
-	if r.requestType == TypeMultipartFormData {
-		body = &bytes.Buffer{}
-		bw = multipart.NewWriter(body.(io.Writer))
+	payload, err := r.buildPayloadAlipayV3()
+	if err != nil {
+		return nil, nil, err
 	}
+	return r.sendWithRetry(ctx, payload)
+}
 
+// buildPayloadAlipayV3 与 buildPayload 的区别：multipart 中每个文本字段是带 application/json 头的 part。
+func (r *Request) buildPayloadAlipayV3() ([]byte, error) {
 	switch r.method {
 	case GET:
-		// do nothing
+		return nil, nil
 	case POST, PUT, DELETE, PATCH:
-		switch r.requestType {
-		case TypeJSON:
-			if r.jsonByte != nil {
-				body = strings.NewReader(string(r.jsonByte))
-			}
-		case TypeFormData:
-			if r.formString != "" {
-				body = strings.NewReader(r.formString)
-			}
-		case TypeMultipartFormData:
-			for k, v := range r.multipartBodyMap {
-				// file_content 参数
-				if file, ok := v.(*gopay.File); ok {
-					fw, e := bw.CreateFormFile(k, file.Name)
-					if e != nil {
-						return nil, nil, e
-					}
-					_, _ = fw.Write(file.Content)
-
-					//h := make(textproto.MIMEHeader)
-					//h.Set("Content-Disposition",
-					//	fmt.Sprintf(`form-data; name="%s"; filename="%s"`,
-					//		escapeQuotes(k), escapeQuotes(file.Name)))
-					//h.Set("Content-Type", "application/octet-stream")
-					//part, e := bw.CreatePart(h)
-					//if e != nil {
-					//	return nil, nil, e
-					//}
-					//_, _ = part.Write(file.Content)
-					continue
-				}
-
-				// text 参数 data
-				h := make(textproto.MIMEHeader)
-				h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"`, escapeQuotes(k)))
-				h.Set("Content-Type", "application/json")
-				part, e := bw.CreatePart(h)
-				if e != nil {
-					return nil, nil, e
-				}
-				switch vs := v.(type) {
-				case string:
-					_, _ = part.Write([]byte(vs))
-				default:
-					xlog.Warnf("multipart-form-data key: %s, value: %s", k, ConvertToString(v))
-					_, _ = part.Write([]byte(ConvertToString(v)))
-				}
-			}
-			_ = bw.Close()
-			r.Header.Set("Content-Type", bw.FormDataContentType())
-		case TypeXML:
-			if r.formString != "" {
-				body = strings.NewReader(r.formString)
-			}
-		default:
-			return nil, nil, errors.New("Request type Error ")
-		}
 	default:
-		return nil, nil, errors.New("Only support GET and POST and PUT and DELETE ")
+		return nil, errors.New("Only support GET and POST and PUT and DELETE ")
 	}
-
-	// request
-	req, err := http.NewRequestWithContext(ctx, r.method, r.url, body)
-	if err != nil {
-		return nil, nil, err
+	switch r.requestType {
+	case TypeJSON:
+		if r.jsonByte != nil {
+			return r.jsonByte, nil
+		}
+		return nil, nil
+	case TypeFormData, TypeXML:
+		if r.formString != "" {
+			return []byte(r.formString), nil
+		}
+		return nil, nil
+	case TypeMultipartFormData:
+		buf := &bytes.Buffer{}
+		bw := multipart.NewWriter(buf)
+		for k, v := range r.multipartBodyMap {
+			// file_content 参数
+			if file, ok := v.(*gopay.File); ok {
+				fw, e := bw.CreateFormFile(k, file.Name)
+				if e != nil {
+					return nil, e
+				}
+				_, _ = fw.Write(file.Content)
+				continue
+			}
+			// text 参数 data
+			h := make(textproto.MIMEHeader)
+			h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"`, escapeQuotes(k)))
+			h.Set("Content-Type", "application/json")
+			part, e := bw.CreatePart(h)
+			if e != nil {
+				return nil, e
+			}
+			switch vs := v.(type) {
+			case string:
+				_, _ = part.Write([]byte(vs))
+			default:
+				xlog.Warnf("multipart-form-data key: %s, value: %s", k, ConvertToString(v))
+				_, _ = part.Write([]byte(ConvertToString(v)))
+			}
+		}
+		_ = bw.Close()
+		r.Header.Set("Content-Type", bw.FormDataContentType())
+		return buf.Bytes(), nil
+	default:
+		return nil, errors.New("Request type Error ")
 	}
-	req.Header = r.Header
-	res, err = r.client.HttpClient.Do(req)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer res.Body.Close()
-	bs, err = io.ReadAll(io.LimitReader(res.Body, int64(r.client.bodySizeMB<<20))) // default 10MB change the size you want
-	if err != nil {
-		return nil, nil, err
-	}
-	return res, bs, nil
 }
 
 func (r *Request) EndBytes(ctx context.Context) (res *http.Response, bs []byte, err error) {
@@ -249,6 +220,11 @@ func (r *Request) EndBytes(ctx context.Context) (res *http.Response, bs []byte, 
 	if err != nil {
 		return nil, nil, err
 	}
+	return r.sendWithRetry(ctx, payload)
+}
+
+// sendWithRetry 按重试策略发送请求；只有安全请求（GET 或带 Idempotency-Key）会重试。
+func (r *Request) sendWithRetry(ctx context.Context, payload []byte) (res *http.Response, bs []byte, err error) {
 	u, _ := url.Parse(r.url)
 	attempts := 1
 	if safeToRetry(r.method, r.Header) && r.client.retry.MaxAttempts > 1 {

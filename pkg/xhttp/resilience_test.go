@@ -157,3 +157,32 @@ func TestBackoffCapsAtMaxDelay(t *testing.T) {
 		}
 	}
 }
+
+func TestAlipayV3PathRetriesGETButNotPOST(t *testing.T) {
+	var getHits, postHits atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodGet {
+			if getHits.Add(1) == 1 {
+				w.WriteHeader(http.StatusServiceUnavailable)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		postHits.Add(1)
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}))
+	defer srv.Close()
+
+	c := NewClient().SetRetry(fastRetry)
+	if _, _, err := c.Req().Get(srv.URL + "/v3/query").EndBytesForAlipayV3(context.Background()); err != nil {
+		t.Fatalf("GET should succeed after retry: %v", err)
+	}
+	if getHits.Load() != 2 {
+		t.Fatalf("GET hits = %d, want 2", getHits.Load())
+	}
+	_, _, _ = c.Req(TypeJSON).Post(srv.URL + "/v3/pay").SendStruct(map[string]string{"a": "b"}).EndBytesForAlipayV3(context.Background())
+	if postHits.Load() != 1 {
+		t.Fatalf("POST without Idempotency-Key was retried on the V3 path: hits = %d", postHits.Load())
+	}
+}
