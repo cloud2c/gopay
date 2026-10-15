@@ -1,5 +1,44 @@
 # Changelog
 
+## v1.5.125
+
+### Feat: Sync go-pay/gopay Upstream Features and Fixes
+
+Brings in new features and fixes from go-pay/gopay as code (commit history is not carried over):
+
+- New Merchant SDKs: China Merchants Bank aggregated payment (`cmbpay`) and Douyin Pay (`douyin`).
+- Alipay electronic invoice support.
+- WeChat Pay V3: new APIs for papay (contract) signing, authorized transfer, violation notices and package types.
+- `go-pay/crypto` v0.0.3: fixes a panic in callback decryption.
+- Alipay WAP payment: uses `QUICK_WAP_WAY`.
+
+### Feat!: Require Alipay V3 Response Signature Verification by Default
+
+**BREAKING CHANGE.** `NewClientV3` now sets `verifyRequired` to `true`. A client
+with neither `SetCert` nor `SetAliPayPublicKey` configured fails on the first
+call instead of silently accepting unverified responses.
+
+Callers who genuinely accept unverified responses opt out explicitly:
+
+```go
+client.SetVerifyRequired(false) // responses are NOT verified
+```
+
+### Fix: Alipay V3 Fixes Carried Over
+
+- Face authentication and marketing voucher APIs pass `authorization` correctly
+  to `doPost` / `doPatch`.
+- Signature verification no longer fails when AES encryption is used.
+- AES response ciphertext is no longer stored on the shared client.
+- Certificate mode follows the official certificate serial number rules.
+- Key mode verifies response signatures.
+- New `WithoutAES` and `Clone` methods on the V3 client.
+
+### Fix: Keep Server Certificate Verification for WeChat and QQ
+
+Two-way certificate configurations keep the client certificate but no longer
+skip verification of the server certificate.
+
 ## v1.5.124
 
 ### Fix!: Verify Server Certificates by Default in HTTP Client
