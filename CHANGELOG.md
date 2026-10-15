@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.6.0
+
+### Breaking: WeChat V3 Business Errors Are Returned as Errors
+
+**BREAKING CHANGE.** When a WeChat V3 API returns a business failure (HTTP status other than 200), the call now returns the response struct **and** a typed error `*wechat/v3.BizErr`. Previously the error was `nil`.
+
+Migration: code that checks only `err` now receives the failure, which is the intended fail-closed behavior. Code that reads `rsp.Code` and `rsp.ErrResponse` needs no change.
+
+`BizErr` satisfies `errors.Is(err, gopay.BusinessErr)`. Its message contains only the HTTP status, error code and description, never the raw body. Non-200 responses with unparsable bodies also return `BizErr` with an empty code.
+
+### Feat: Alipay V3 Retry Path
+
+`EndBytesForAlipayV3` shares the retry loop with the standard request path. Only GET requests, or requests carrying `Idempotency-Key`, are retried.
+
 ## v1.5.126
 
 ### Feat: Transport Retry, Error Classification and Observation
