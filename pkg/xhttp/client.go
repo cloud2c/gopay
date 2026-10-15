@@ -59,6 +59,18 @@ func (c *Client) SetHttpTLSConfig(tlsCfg *tls.Config) (client *Client) {
 	return c
 }
 
+// SetTLSVerify 显式设置是否校验服务端证书，默认 true。
+// verify=false 仅用于测试或沙箱环境，调用方须自行限制生产使用并记录审计。
+func (c *Client) SetTLSVerify(verify bool) (client *Client) {
+	if ht, ok := c.HttpClient.Transport.(*http.Transport); ok {
+		if ht.TLSClientConfig == nil {
+			ht.TLSClientConfig = &tls.Config{MinVersion: tls.VersionTLS12}
+		}
+		ht.TLSClientConfig.InsecureSkipVerify = !verify
+	}
+	return c
+}
+
 func (c *Client) SetTimeout(timeout time.Duration) (client *Client) {
 	c.HttpClient.Timeout = timeout
 	return c

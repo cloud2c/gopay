@@ -19,3 +19,16 @@ func TestDefaultClientVerifiesServerCertificate(t *testing.T) {
 		t.Fatal("default client skips server certificate verification")
 	}
 }
+
+// SetTLSVerify(false) 只能显式关闭校验，且可再次开启。
+func TestSetTLSVerifyTogglesExplicitly(t *testing.T) {
+	c := NewClient().SetTLSVerify(false)
+	tr := c.HttpClient.Transport.(*http.Transport)
+	if !tr.TLSClientConfig.InsecureSkipVerify {
+		t.Fatal("SetTLSVerify(false) did not disable verification")
+	}
+	c.SetTLSVerify(true)
+	if tr.TLSClientConfig.InsecureSkipVerify {
+		t.Fatal("SetTLSVerify(true) did not re-enable verification")
+	}
+}
