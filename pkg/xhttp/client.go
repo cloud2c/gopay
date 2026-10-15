@@ -8,7 +8,9 @@ import (
 
 type Client struct {
 	HttpClient *http.Client
-	bodySizeMB int // body size limit (MB), default is 10MB
+	bodySizeMB int         // body size limit (MB), default is 10MB
+	retry      RetryPolicy // 重试策略，零值不重试
+	observer   Observer    // 观测钩子，可为空
 }
 
 func defaultClient() *Client {

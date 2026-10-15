@@ -3,6 +3,8 @@ package alipay
 import (
 	"errors"
 	"fmt"
+
+	"github.com/cloud2c/gopay"
 )
 
 // BizErr 用于判断支付宝的业务逻辑是否有错误
@@ -37,6 +39,11 @@ func bizErrCheckTradePay(errRsp ErrorResponse) error {
 		}
 	}
 	return nil
+}
+
+// Is 使支付宝业务错误满足 errors.Is(err, gopay.BusinessErr)。
+func (e *BizErr) Is(target error) bool {
+	return target == gopay.BusinessErr
 }
 
 func (e *BizErr) Error() string {

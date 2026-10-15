@@ -1,3 +1,13 @@
+## 版本号：v1.5.126
+
+* 修改记录：
+    * 传输层（pkg/xhttp）：
+        * 重试策略 `SetRetry(RetryPolicy)`：只对安全请求重试（GET，或携带 `Idempotency-Key` 的请求），只对网络错误与 502、503、504 重试；创建类 POST 不重试，避免重复扣款。默认不重试。
+        * 错误分类：`xhttp.ErrNetwork`、`xhttp.ErrTimeout`、`xhttp.ErrHTTPStatus`，可用 `errors.Is` 判断；错误信息不包含查询串与请求体。
+        * 观测钩子 `SetObserver(Observer)`：每次尝试回调一次（方法、主机、路径、状态码、尝试次数、耗时、错误类别）；默认关闭。
+    * 业务错误：新增 `gopay.BusinessErr`；支付宝业务错误 `BizErr` 满足 `errors.Is(err, gopay.BusinessErr)`。
+    * 支付宝网关：导出 `ProductionGatewayURL`、`SandboxGatewayURL` 与 `GatewayURL(isProd)`，调用方无需手写地址。
+
 ## 版本号：v1.5.125
 
 * 修改记录：

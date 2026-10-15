@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.5.126
+
+### Feat: Transport Retry, Error Classification and Observation
+
+- `xhttp.Client.SetRetry(RetryPolicy)`: retries only safe requests (GET, or requests carrying `Idempotency-Key`) on network errors and 502/503/504. Create-style POSTs are never retried by default, to avoid duplicate charges.
+- Typed transport errors: `xhttp.ErrNetwork`, `xhttp.ErrTimeout`, `xhttp.ErrHTTPStatus`, matched with `errors.Is`. Messages never include query strings or bodies.
+- `xhttp.Client.SetObserver(Observer)`: called once per attempt with method, host, path, status, attempt, duration and error class. Disabled by default.
+
+### Feat: Shared Business Error Sentinel
+
+- `gopay.BusinessErr`. Alipay `BizErr` satisfies `errors.Is(err, gopay.BusinessErr)`.
+
+### Feat: Alipay Gateway Constants
+
+- `alipay.ProductionGatewayURL`, `alipay.SandboxGatewayURL`, and `alipay.GatewayURL(isProd)`.
+
 ## v1.5.125
 
 ### Feat: Sync go-pay/gopay Upstream Features and Fixes

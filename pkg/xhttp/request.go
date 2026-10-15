@@ -14,6 +14,7 @@ import (
 	"net/url"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/go-pay/xlog"
 
@@ -244,75 +245,115 @@ func (r *Request) EndBytes(ctx context.Context) (res *http.Response, bs []byte, 
 	if r.err != nil {
 		return nil, nil, r.err
 	}
-	var (
-		body io.Reader
-		bw   *multipart.Writer
-	)
-	// multipart-form-data
-	if r.requestType == TypeMultipartFormData {
-		body = &bytes.Buffer{}
-		bw = multipart.NewWriter(body.(io.Writer))
+	payload, err := r.buildPayload()
+	if err != nil {
+		return nil, nil, err
 	}
+	u, _ := url.Parse(r.url)
+	attempts := 1
+	if safeToRetry(r.method, r.Header) && r.client.retry.MaxAttempts > 1 {
+		attempts = r.client.retry.MaxAttempts
+	}
+	for attempt := 1; ; attempt++ {
+		res, bs, err = r.doOnce(ctx, u, payload, attempt)
+		status := 0
+		if res != nil {
+			status = res.StatusCode
+		}
+		if attempt >= attempts || !retryable(status, err) {
+			return res, bs, err
+		}
+		if e := sleepCtx(ctx, r.client.retry.backoff(attempt)); e != nil {
+			return nil, nil, e
+		}
+	}
+}
 
+// buildPayload 按请求类型生成本次请求的请求体字节；GET 与无请求体的请求返回 nil。
+// 每次尝试使用新的 Reader，因此可以安全重试。
+func (r *Request) buildPayload() ([]byte, error) {
 	switch r.method {
 	case GET:
-		// do nothing
+		return nil, nil
 	case POST, PUT, DELETE, PATCH:
-		switch r.requestType {
-		case TypeJSON:
-			if r.jsonByte != nil {
-				body = strings.NewReader(string(r.jsonByte))
-			}
-		case TypeFormData:
-			if r.formString != "" {
-				body = strings.NewReader(r.formString)
-			}
-		case TypeMultipartFormData:
-			for k, v := range r.multipartBodyMap {
-				// file 参数
-				if file, ok := v.(*gopay.File); ok {
-					fw, e := bw.CreateFormFile(k, file.Name)
-					if e != nil {
-						return nil, nil, e
-					}
-					_, _ = fw.Write(file.Content)
-					continue
-				}
-				// text 参数
-				switch vs := v.(type) {
-				case string:
-					_ = bw.WriteField(k, vs)
-				default:
-					_ = bw.WriteField(k, ConvertToString(v))
-				}
-			}
-			_ = bw.Close()
-			r.Header.Set("Content-Type", bw.FormDataContentType())
-		case TypeXML:
-			if r.formString != "" {
-				body = strings.NewReader(r.formString)
-			}
-		default:
-			return nil, nil, errors.New("Request type Error ")
-		}
 	default:
-		return nil, nil, errors.New("Only support GET and POST and PUT and DELETE ")
+		return nil, errors.New("Only support GET and POST and PUT and DELETE ")
 	}
+	switch r.requestType {
+	case TypeJSON:
+		if r.jsonByte != nil {
+			return r.jsonByte, nil
+		}
+		return nil, nil
+	case TypeFormData, TypeXML:
+		if r.formString != "" {
+			return []byte(r.formString), nil
+		}
+		return nil, nil
+	case TypeMultipartFormData:
+		buf := &bytes.Buffer{}
+		bw := multipart.NewWriter(buf)
+		for k, v := range r.multipartBodyMap {
+			// file 参数
+			if file, ok := v.(*gopay.File); ok {
+				fw, e := bw.CreateFormFile(k, file.Name)
+				if e != nil {
+					return nil, e
+				}
+				_, _ = fw.Write(file.Content)
+				continue
+			}
+			// text 参数
+			switch vs := v.(type) {
+			case string:
+				_ = bw.WriteField(k, vs)
+			default:
+				_ = bw.WriteField(k, ConvertToString(v))
+			}
+		}
+		_ = bw.Close()
+		r.Header.Set("Content-Type", bw.FormDataContentType())
+		return buf.Bytes(), nil
+	default:
+		return nil, errors.New("Request type Error ")
+	}
+}
 
-	// request
+// doOnce 执行一次请求尝试，并通知观测钩子。
+func (r *Request) doOnce(ctx context.Context, u *url.URL, payload []byte, attempt int) (*http.Response, []byte, error) {
+	var body io.Reader
+	if payload != nil {
+		body = bytes.NewReader(payload)
+	}
+	start := time.Now()
 	req, err := http.NewRequestWithContext(ctx, r.method, r.url, body)
 	if err != nil {
 		return nil, nil, err
 	}
 	req.Header = r.Header
-	res, err = r.client.HttpClient.Do(req)
-	if err != nil {
-		return nil, nil, err
+	res, err := r.client.HttpClient.Do(req)
+	var bs []byte
+	if err == nil {
+		defer res.Body.Close()
+		bs, err = io.ReadAll(io.LimitReader(res.Body, int64(r.client.bodySizeMB<<20))) // default 10MB change the size you want
 	}
-	defer res.Body.Close()
-	bs, err = io.ReadAll(io.LimitReader(res.Body, int64(r.client.bodySizeMB<<20))) // default 10MB change the size you want
+	if r.client.observer != nil {
+		status := 0
+		if res != nil {
+			status = res.StatusCode
+		}
+		ev := Event{Method: r.method, Attempt: attempt, Duration: time.Since(start), Status: status}
+		if u != nil {
+			ev.Host = u.Host
+			ev.Path = u.Path
+		}
+		if err != nil {
+			ev.Err = classify(r.method, u, err)
+		}
+		r.client.observer(ctx, ev)
+	}
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, classify(r.method, u, err)
 	}
 	return res, bs, nil
 }

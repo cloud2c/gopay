@@ -14,7 +14,10 @@ var (
 	UnmarshalErr           = errors.New("unmarshal error")
 	SignatureErr           = errors.New("signature error")
 	VerifySignatureErr     = errors.New("verify signature error")
-	CertNotMatchErr        = errors.New("cert not match error")
-	GetSignDataErr         = errors.New("get signature data error")
-	BodyMapNilErr          = errors.New("body map is nil")
+	// BusinessErr 表示渠道明确拒绝了业务请求（如参数不合法、余额不足）。
+	// 各渠道的业务错误类型实现 errors.Is(err, gopay.BusinessErr)。
+	BusinessErr     = errors.New("business error")
+	CertNotMatchErr = errors.New("cert not match error")
+	GetSignDataErr  = errors.New("get signature data error")
+	BodyMapNilErr   = errors.New("body map is nil")
 )
