@@ -22,7 +22,7 @@ func defaultClient() *Client {
 					Timeout:   30 * time.Second,
 					KeepAlive: 30 * time.Second,
 				}),
-				TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
+				TLSClientConfig:       &tls.Config{MinVersion: tls.VersionTLS12},
 				MaxIdleConnsPerHost:   1000,
 				MaxConnsPerHost:       3000,
 				IdleConnTimeout:       90 * time.Second,
@@ -36,7 +36,8 @@ func defaultClient() *Client {
 	}
 }
 
-// NewClient , default tls.Config{InsecureSkipVerify: true}
+// NewClient 默认启用 TLS 证书校验（MinVersion TLS1.2）。
+// 仅测试或沙箱环境可通过 SetHttpTLSConfig 显式传入 InsecureSkipVerify，生产不得使用。
 func NewClient() (client *Client) {
 	return defaultClient()
 }

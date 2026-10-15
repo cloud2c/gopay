@@ -140,8 +140,8 @@ func (w *Client) addCertConfig(certFile, keyFile, pkcs12File any) (tlsConfig *tl
 			return nil, fmt.Errorf("tls.LoadX509KeyPair: %w", err)
 		}
 		tlsConfig = &tls.Config{
-			Certificates:       []tls.Certificate{certificate},
-			InsecureSkipVerify: true,
+			Certificates: []tls.Certificate{certificate},
+			MinVersion:   tls.VersionTLS12,
 		}
 		return tlsConfig, nil
 	}
